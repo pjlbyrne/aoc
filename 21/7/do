@@ -1,0 +1,25 @@
+#!/bin/python
+
+dat = []
+with open ( 'dt' ) as f:
+  for l in f:
+    l = l.strip()
+    for n in l.split(','):
+      i = int( n )
+      dat.append( i )
+      #print( i )
+
+print( dat )
+#exit()
+print( sum( dat ), '/', len( dat ), '=', sum( dat ) / len( dat ))
+
+fmin = 99999999
+for i in range( min( dat ), max( dat )):
+  f = 0
+  for d in dat:
+    x = abs( d - i )
+    f += ( x * (x+1) ) / 2
+  fmin = min( fmin, f )
+
+print( 'fmin', fmin )
+

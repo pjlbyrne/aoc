@@ -1,0 +1,110 @@
+#!/bin/python
+
+import numpy as np
+import sys
+
+sys.setrecursionlimit( 100000 )
+
+dpath = sys.argv[ 1 ]
+
+lines = []
+with open( dpath ) as f:
+  for l in f:
+    l = l.strip()
+    lines.append( l.strip() )
+
+W = len( lines[ 0 ])
+H = len( lines )
+M = np.zeros(( H, W ), np.int8 )
+S = np.full(( H, W ), 9999 )
+P = np.zeros(( H, W ), np.int8 )
+Mn = np.zeros(( H, W ), np.int8 )
+Ms = np.zeros(( H, W ), np.int8 )
+Me = np.zeros(( H, W ), np.int8 )
+Mw = np.zeros(( H, W ), np.int8 )
+D = { 'n': Mn, 's': Ms, 'e': Me, 'w': Mw } 
+r, c, Sr, Sc, Er, Ec = 0, 0, 0, 0, 0, 0
+orda = ord( 'a' )
+for r, line in enumerate( lines ):
+  for c, ch in enumerate( lines[ r ]):
+    if ch == 'S':
+      Sr, Sc, h = r, c, 0
+    elif ch == 'E':
+      Er, Ec, h = r, c, 25
+    else:
+      h = ord( ch ) - orda
+    M[ r ][ c ] = h
+
+#print( M )
+#print( Sr, Sc, Er, Ec )
+
+turns = {
+  'n': 'e'
+, 's': 'w'
+, 'e': 's'
+, 'w': 'n'
+}
+moves = { 
+  'n': ( -1,  0 )
+, 's': (  1,  0 )
+, 'e': (  0,  1 )
+, 'w': (  0, -1 )
+}
+
+def show():
+
+  for r in range( H ):
+    l = ''.join( str( P[r][c] ) for c in range( W ))
+    print( l )
+def walk( r, c, s ):
+
+  #print( S )
+  if P[ r ][ c ] == 1: return   # current path already here
+  s += 1                        # extra step
+  if s >= S[ r ][ c ]: return   # already a shorter path to here
+  P[ r ][ c ] = 1               # we are here
+  S[ r ][ c ] = s               # set new shortest path to here
+  #if c == Ec and r == Er:
+  #  show()
+
+  # look for direction nearest to goal
+  dr = Er - r
+  dc = Ec - c
+  d = ' '
+  h = M[ r ][ c ]
+  probe = r == 4 and c == 7 and False
+  if probe:
+    print( M )
+    print( S )
+    print( 'dr', dr, 'dc', dc, 'h', h )
+  dirs = {}
+  if r > 0     and M[ r - 1 ][ c ] <= h + 1 and P[ r - 1 ][ c ] == 0: dirs[ M[ r - 1 ][ c ]] = 'n'
+  if r < H - 1 and M[ r + 1 ][ c ] <= h + 1 and P[ r + 1 ][ c ] == 0: dirs[ M[ r + 1 ][ c ]] = 's'
+  if c < W - 1 and M[ r ][ c + 1 ] <= h + 1 and P[ r ][ c + 1 ] == 0: dirs[ M[ r ][ c + 1 ]] = 'e'
+  if c > 0     and M[ r ][ c - 1 ] <= h + 1 and P[ r ][ c - 1 ] == 0: dirs[ M[ r ][ c - 1 ]] = 'w'
+  #print( dirs )
+  if not dirs:
+    P[ r ][ c ] = 0
+    return # dead end
+  d = dirs[ max( dirs.keys() )]
+  #print( 'd', d )
+
+  for i in range( 4 ):
+    dr, dc = moves[ d ]
+    if probe: print( 'dr', dr, 'dc', dc )
+    _r, _c = r + dr, c + dc
+    if probe: print( '_r', _r, '_c', _c )
+    #print( _r, _c, dr, dc )
+    if _r < 0 or _r >= H or _c < 0 or _c >= W: continue
+    if M[ _r, _c ] <= M[ r ][ c ] + 1 and P[ _r ][ _c ] == 0:
+       walk( _r, _c, s )
+    d = turns[ d ]
+
+  P[ r ][ c ] = 0
+
+s = 0
+P[ Sr ][ Sc ] = s
+walk( Sr, Sc, s )
+print( S )
+print( 'part1', S[ Er ][ Ec ] - 1)
+

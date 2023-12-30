@@ -1,0 +1,62 @@
+#!/bin/python
+
+
+instrs = []
+with open( 'da' ) as f:
+  for l in f:
+    l = l.strip()
+    d, n = l[0], int( l[ 1: ])
+    if   d == 'L': d = 'L' if n == 90 else 'A' if n == 180 else 'R'
+    elif d == 'R': d = 'R' if n == 90 else 'A' if n == 180 else 'L'
+    if d == 'A':
+      instrs.append(( 'L', 0 ))
+      instrs.append(( 'L', 0 ))
+    else:
+      instrs.append(( d, n ))
+
+#print( instrs )
+
+def run1( instrs ):
+  x, y, o = 0, 0, 'E'
+  for d, n in instrs:
+    if   d == 'N': y -= n
+    elif d == 'S': y += n
+    elif d == 'E': x += n
+    elif d == 'W': x -= n
+    elif d == 'L': o = 'N' if o == 'E' else 'W' if o == 'N' else 'S' if o == 'W' else 'E'
+    elif d == 'R': o = 'S' if o == 'E' else 'W' if o == 'S' else 'N' if o == 'W' else 'E'
+    elif d == 'F':
+      if   o == 'E': x += n
+      elif o == 'S': y += n
+      elif o == 'W': x -= n
+      else         : y -= n
+  return x, y
+
+x, y = run1( instrs )
+print( 'x', x, 'y', y )
+print( 'part1:', abs( x ) + abs( y )) # 1533
+
+
+def run2( instrs ):
+
+  x, y = 0, 0
+  dx, dy = 10, 1
+  for d, n in instrs:
+      
+    if   d == 'N': dy += n
+    elif d == 'S': dy -= n
+    elif d == 'E': dx += n
+    elif d == 'W': dx -= n
+    elif d == 'R': dx, dy = dy, -1 * dx
+    elif d == 'L': dx, dy = -1 * dy, dx
+    elif d == 'F': x += n * dx; y += n * dy
+  
+    print( 'd: {}, n: {:>4}, x: {:>4}, y: {:>4}, dx: {:>4}, dy: {:>4}'.format( \
+        d, n, x, y, dx, dy ))
+
+  return x, y
+
+x, y = run2( instrs )
+print( 'x', x, 'y', y )
+print( 'part2:', abs( x ) + abs( y ))
+

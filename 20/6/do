@@ -1,0 +1,28 @@
+#!/bin/python
+
+cts = []
+n = 0
+
+def iter( fname ):
+    with open( fname ) as f:
+        group = []
+        for l in f:
+            l = l.strip()
+            if not l:
+                yield group
+                group = []
+            else:
+                s = set( c for c in l )
+                group.append( s )
+        yield group
+
+tot = 0
+for group in iter( 'da' ):
+    #for answers in group:
+    #    print([ c for c in answers ])
+    i = set.intersection( *group )
+    #print( len( i ))
+    tot += len( i )
+
+print( tot )
+

@@ -1,0 +1,81 @@
+#!/bin/python
+
+from collections import defaultdict
+
+lines = open('dat').read().splitlines()
+
+numbers = {}
+symbols = {}
+
+max_c, max_r = 0,0
+
+for r,line in enumerate(lines):
+    number = ''
+    for c,char in enumerate(line):
+        if char in ['0','1','2','3','4','5','6','7','8','9']:
+            number += char
+        else:
+            if number != '':
+                for i in range(len(number)):
+                    numbers[(r,c-i-1)] = int(number)
+            number = ''
+            if char != '.':
+                symbols[(r,c)] = char
+        max_c = c
+
+    if number != '':
+        for i in range(len(number)):
+            numbers[(r,max_c-i)] = int(number)
+
+    max_r = r
+
+parts = set()
+
+def get_adjacents(loc):
+    r,c = loc
+    adjs = []
+    for dr,dc in [(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]:
+        nr,nc = r+dr,c+dc
+        if 0<=nr<=max_r and 0<=nc<=max_c:
+            adjs.append((nr,nc))
+    return adjs
+
+total = 0
+
+for symbol in symbols.keys():
+    parts = []
+    adjs = get_adjacents(symbol)
+    rows = defaultdict(list)
+    for adj in adjs:
+        if adj in numbers.keys():
+            part = numbers[adj]
+            row = adj[0]
+            if part not in rows[row]:
+                parts.append(part)
+                rows[row].append(part)
+
+    total += sum(parts)
+
+print('Part 1:', total)
+
+total = 0
+
+for symbol_loc, symbol in symbols.items():
+    if symbol == '*':
+        parts = []
+        adjs = get_adjacents(symbol_loc)
+        rows = defaultdict(list)
+        for adj in adjs:
+            if adj in numbers.keys():
+                part = numbers[adj]
+                row = adj[0]
+                if part not in rows[row]:
+                    parts.append(part)
+                    rows[row].append(part)
+        if len(parts) == 2:
+            total += parts[0] * parts[1]
+
+print('Part 2:', total)
+
+
+

@@ -1,0 +1,77 @@
+#!/bin/python
+
+from itertools import zip_longest as zzip
+import sys
+
+dpath = sys.argv[ 1 ]
+
+packets = []
+with open( dpath ) as f:
+
+  l = f.readline()
+  while l:
+    r = f.readline()
+    exec('t =( {}, {} )'.format( l, r ))
+    packets.append( t )
+    f.readline()
+    l = f.readline()
+
+#print( packets )
+
+def lt( l, r ):
+
+  if l is None: return True
+  if r is None: return False
+  tl, tr = type( l ), type( r )
+  if tl is int and tr is int:
+
+      if l < r: return True
+      if l > r: return False
+      return None
+    
+  if tl is list and tr is int: r = [ r ]
+  if tr is list and tl is int: l = [ l ]
+
+  for _l, _r in zzip( l, r ):
+
+    res = lt( _l, _r )
+    if res is not None: return res
+
+  return None
+
+t = 0
+for i, ( l, r ) in enumerate( packets ):
+
+  if lt( l, r ): t += i + 1
+
+print( 'part1', t )
+
+class Packet:
+  def __init__( self, dat, div = False ):
+    self.dat, self.div = dat, div
+  def __lt__( self, other ):
+    return lt( self.dat, other.dat )
+
+packets = []
+with open( dpath ) as f:
+
+  l1= f.readline()
+  while l1:
+    l2 = f.readline()
+    exec('l = {}'.format( l1 ))
+    print('l = {}'.format( l1 ))
+    exec('r = {}'.format( l2 ))
+    print('r = {}'.format( l2 ))
+    packets.append( Packet( l ))
+    packets.append( Packet( r ))
+    f.readline()
+    l1 = f.readline()
+packets.append( Packet([[ 2 ]], div = True ))
+packets.append( Packet([[ 6 ]], div = True ))
+
+packets.sort()
+for i, p in enumerate( packets ):
+  if p.div: print( i + 1 )
+  #print( p.dat )
+
+

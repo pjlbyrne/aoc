@@ -1,0 +1,85 @@
+#!/bin/python
+
+import heapq
+import numpy as np
+import sys
+
+sys.setrecursionlimit( 100000 )
+
+dpath = sys.argv[ 1 ]
+
+lines = []
+with open( dpath ) as f:
+  for l in f:
+    l = l.strip()
+    lines.append( l.strip() )
+
+W = len( lines[ 0 ])
+H = len( lines )
+M = np.zeros(( H, W ), np.int8 )
+Sr, Sc, Er, Ec = 0, 0, 0, 0
+orda = ord( 'a' )
+for r, line in enumerate( lines ):
+  for c, ch in enumerate( lines[ r ]):
+    if ch == 'S':
+      Sr, Sc, h = r, c, 0
+    elif ch == 'E':
+      Er, Ec, h = r, c, 25
+    else:
+      h = ord( ch ) - orda
+    M[ r ][ c ] = h
+
+class Node:
+  def __init__( self, r, c, h ):
+    self.r, self.c, self.h, self.s = r, c, h, 9999
+  def __eq__( self   ,  other ):
+    return    self.s == other.s
+  def __ne__( self   ,  other ):
+    return    self.s != other.s
+  def __gt__( self   ,  other ):
+    return    self.s >  other.s
+  def __lt__( self   ,  other ):
+    return    self.s <  other.s
+  def __ge__( self   ,  other ):
+    return    self.s >= other.s
+  def __le__( self   ,  other ):
+    return    self.s <= other.s
+  def __repr__( self ):
+    return '[{},{},{}] {}'.format( self.r, self.c, self.h, self.s )
+
+noderc = []
+nodes = []
+for r in range( H ):
+  nodec = []
+  noderc.append( nodec )
+  for c in range( W ):
+    n = Node( r, c, M[ r, c ])
+    if r == Sr and c == Sc: n.s = 0
+    nodes.append( n )
+    nodec.append( n )
+
+heapq.heapify( nodes )
+
+print( 'start')
+while nodes:
+  print( len( nodes ))
+  #print( nodes ); input()
+  n = heapq.heappop( nodes )
+  r, c = n.r, n.c
+  s = n.s + 1
+  h = M[ r ][ c ] + 1 # height of neighbour we can reach
+  nsew = [            # coords of neighbours
+    ( r - 1, c )
+  , ( r + 1, c )
+  , ( r, c + 1 )
+  , ( r, c - 1 )
+  ]
+  for y, x in nsew:
+    if y < 0 or y == H or x < 0 or x == W: continue
+    _n = noderc[ y ][ x ]
+    if M[ y ][ x ] <= h and s < _n.s:
+      _n.s = s
+  nodes.sort()
+    
+print( 'part1', noderc[ Er ][ Ec ].s) # 449 high
+

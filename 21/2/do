@@ -1,0 +1,18 @@
+#!/bin/python
+
+x, y, z = 0, 0, 0
+aim = 0
+with open( 'dat' ) as f:
+  for l in f:
+     a, b  = l.split()
+     #print( a, int( b ) )
+     b = int( b )
+     if   a == 'down': aim += b
+     elif a == 'up': aim -= b
+     elif a == 'forward':
+       y += b
+       z += aim * b
+     print( y, z )
+
+print( y * z )
+

@@ -1,0 +1,72 @@
+#!/bin/python
+
+from collections import deque
+
+key = deque()
+keylen = 25
+
+def iter():
+
+    with open( 'da' ) as f:
+
+        for l in f:
+
+            l = l.strip()
+            yield( int( l ))
+
+def is_valid( num ):
+
+    if len( key ) < keylen:
+        return True
+
+    for k1 in key:
+        for k2 in key:
+            if k1 + k2 == num:
+                return True
+    return False
+
+
+def get_invalid():
+
+    for num in iter():
+
+        if not is_valid( num ):
+            return num
+
+        key.append( num )
+        if len( key ) > keylen:
+            key.popleft()
+
+    return None
+
+misfit = get_invalid()
+print( 'part_1:', misfit )
+
+key = deque()
+tot = 0
+
+def pt2_check():
+
+    if tot == misfit:
+        k0, k1 = key[ 0 ], key[ -1 ]
+        m0 = min( key )
+        m1 = max( key )
+        print( 'key: {}\nk0: {}\n k1: {}\n, m0: {}\nm1: {}\nm0 + m1: {}'.format( \
+            key, k0, k1, m0, m1, m0 + m1 ))
+        exit( 0 )
+        
+for num in iter():
+
+    tot += num
+    key.append( num )
+    #print( tot, key )
+
+    pt2_check()
+
+    while tot > misfit:
+
+        tot -= key.popleft()
+        #print( tot, key )
+        pt2_check()
+
+# 32745643 too high

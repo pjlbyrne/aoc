@@ -1,0 +1,40 @@
+#!/bin/python
+
+
+cts = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0 }
+
+#with open( 'dt' ) as f:
+with open( 'dat' ) as f:
+  for l in f:
+    l = l.strip()
+    for n in l.split(','):
+      i = int( n )
+      cts[ i ] += 1
+
+print( 'cts', cts )
+
+for day in range( 256 ):
+
+    c0 = cts[ 1 ]
+    c1 = cts[ 2 ]
+    c2 = cts[ 3 ]
+    c3 = cts[ 4 ]
+    c4 = cts[ 5 ]
+    c5 = cts[ 6 ]
+    c6 = cts[ 7 ] + cts[ 0 ]
+    c7 = cts[ 8 ]
+    c7 = cts[ 0 ]
+
+    cts = { 
+      0: cts[ 1 ]
+    , 1: cts[ 2 ]
+    , 2: cts[ 3 ]
+    , 3: cts[ 4 ]
+    , 4: cts[ 5 ]
+    , 5: cts[ 6 ]
+    , 6: cts[ 7 ] + cts[ 0 ]
+    , 7: cts[ 8 ]
+    , 8: cts[ 0 ]
+    }
+
+print( 'part1', sum( v for v in cts.values() ))

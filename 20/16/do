@@ -1,0 +1,102 @@
+#!/bin/python
+
+from math import prod
+
+with open( 'da' ) as f:
+
+  fields = {}
+  stage = 1
+  tickets = []
+  for l in f:
+
+    l = l.strip()
+    if not l:
+      stage += 1
+      continue
+
+    if stage == 1:
+      f, v = l.split( ':' )
+      ranges = []
+      for r in v.split():
+        if r == 'or': continue
+        r0, r1 = r.split( '-' )
+        ranges.append(( int( r0 ), int( r1 )))
+      fields[ f ] = ranges
+
+    elif stage == 2:
+      if l == 'your ticket:': continue
+      my_ticket = [ int( v ) for v in l.split( ',' ) ]
+         
+      
+    elif stage == 3:
+      if l == 'nearby tickets:': continue
+      t = [ int( v ) for v in l.split( ',' ) ]
+      tickets.append( t )
+
+print( 'fields', fields )
+print( 'my ticket', my_ticket )
+print( 'nearby tickets', len( tickets ))
+print()
+
+# part1
+tickets2 = []
+err_rate = 0
+for ticket in tickets:
+  #print( 'ticket', ticket )
+  ok_ticket = True
+  for i, val in enumerate( ticket ):
+    ok_field_ct = 0
+    for j, ( field, ranges ) in enumerate( fields.items() ):
+      if any ( r0 <= val <= r1 for r0, r1 in ranges ):
+        ok_field_ct += 1
+    if not ok_field_ct:
+      err_rate += val
+      ok_ticket = False
+  if ok_ticket:
+    tickets2.append( ticket )
+
+print( 'part1', err_rate )
+print( 'len( tickets )', len( tickets ))
+print( 'len( tickets2 )', len( tickets2 ))
+
+nok_fields = [ set( range( len( fields ))) for _ in range( len( fields ))]
+for ticket in tickets2:
+  #print( 'ticket', ticket )
+  for i, val in enumerate( ticket ):
+    ok_range_ct = 0
+    for j, ( field, ranges ) in enumerate( fields.items() ):
+      if any ( r0 <= val <= r1 for r0, r1 in ranges ):
+        ok_range_ct += 1
+      else:
+        if i in nok_fields[ j ]:
+          nok_fields[ j ].remove( i )
+          #if len( nok_fields[ i ]) == 0 :
+          #  print( 'val', val, 'i', i, 'j', j, 'ranges', ranges )
+          #  print( 'nok_fields[ {} ]'.format( j ), nok_fields[ j ])
+          #  input()
+
+for nok_field in nok_fields:
+  print( nok_field )
+
+field_map = {}
+while True:
+  for i, nok_field in enumerate( nok_fields ):
+    if len( nok_field ) == 1:
+      x = nok_field.pop()
+      field_map[ i ] = x
+      for _nok_field in nok_fields:
+        if x in _nok_field:
+          _nok_field.remove( x )
+  if all( len( x ) == 0 for x in nok_fields ):
+    break
+
+print( 'field_map', field_map )
+dep_vals = []
+for i, field in enumerate( fields ):
+  if field.startswith( 'departure' ):
+    idx = field_map[ i ]
+    dep_vals.append( my_ticket[ idx ])
+
+print( 'part2', prod( dep_vals ))
+
+

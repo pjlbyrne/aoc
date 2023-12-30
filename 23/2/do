@@ -1,0 +1,52 @@
+#!/bin/python
+
+src = 'd0'
+src = 'dat'
+
+cols = [ 'blue', 'green', 'red' ]
+cr, cg, cb = 12, 13, 14
+
+t1 = 0
+with open( src ) as f:
+  for l in f:
+    l = l.strip()
+    l0, l1 = l.split( ':' )
+    ig = int( l0.split()[ 1 ])
+    rounds = l1.split( ';' )
+    ok = True
+    for round in rounds:
+      balls = round.split( ',' )
+      for ball in balls:
+        n, col = ball.split()
+        n = int( n )
+        #print( '  ', n, col )
+        if   col == 'red'   and n > cr: ok = False
+        elif col == 'green' and n > cg: ok = False
+        elif col == 'blue'  and n > cb: ok = False
+    #print( ig, ok )
+    if ok: t1 += ig
+
+print( 'part1', t1 )
+
+t2 = 0
+with open( src ) as f:
+  for l in f:
+    l = l.strip()
+    l0, l1 = l.split( ':' )
+    ig = int( l0.split()[ 1 ])
+    rounds = l1.split( ';' )
+    mr, mg, mb = 0, 0, 0
+    for round in rounds:
+      balls = round.split( ',' )
+      for ball in balls:
+        n, col = ball.split()
+        n = int( n )
+        if   col == 'red'   and n > mr: mr = n
+        elif col == 'green' and n > mg: mg = n
+        elif col == 'blue'  and n > mb: mb = n
+    pwr = mr * mg * mb
+    #print( ig, pwr, mr, mg, mb )
+    t2 += pwr
+
+print( 'part2', t2 )
+

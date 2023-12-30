@@ -1,0 +1,37 @@
+#!/bin/python
+
+mem = []
+with open( 'da' ) as f:
+    for l in f:
+        op, arg = l.split()
+        arg = int( arg )
+        mem.append(( op, arg ))
+
+def is_halting():
+    acc = 0
+    pc = 0
+    z = set()
+    while True:
+        if pc == len( mem ):
+            return True, acc
+        if pc in z:
+            return False, acc
+        z.add( pc )
+        op, arg = mem[ pc ]
+        if op == 'nop':
+            pc += 1
+        elif op == 'acc':
+            acc += arg
+            pc += 1
+        elif op == 'jmp':
+            pc += arg
+
+for i in range( len( mem )):
+    op, arg = mem[ i ]
+    op2 = 'jmp' if op == 'nop' else 'nop' if op == 'jmp' else op
+    mem[ i ] = ( op2, arg )
+    halts, acc = is_halting()
+    if halts:
+        print( i, acc )
+    mem[ i ] = ( op, arg )
+

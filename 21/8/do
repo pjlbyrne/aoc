@@ -1,0 +1,51 @@
+#!/bin/python
+
+class Dsp: # Display
+  def __init__( self, pats, digs ):
+    pats = [ set( p ) for p in pats ]
+    for p in pats: # digits with unique segment length 1(2) 4(4) 7(3) 8(7)
+      if   len( p ) == 2: p1 = p
+      elif len( p ) == 4: p4 = p
+      elif len( p ) == 3: p7 = p
+      elif len( p ) == 7: p8 = p
+    for p in pats:
+      if   len( p ) == 6:         # 6 segments digits 0/6/9
+        if   p & p4 == p4       : p9 = p # only 9 has all of 4 in it
+        elif p & p1 == p1       : p0 = p # of 6 and 0 only 0 has all of 1 in it
+        else                    : p6 = p
+      elif len( p ) == 5:         # 5 segments digits 2/3/5
+        if   p & p1 == p1       : p3 = p # only 3 has all of 1 in it
+        elif len( p & p4 ) == 2 : p2 = p
+        else                    : p5 = p
+    ps = [ p0, p1, p2, p3, p4, p5, p6, p7, p8, p9 ]
+    ps = [ ''.join( sorted( p )) for p in ps ]
+    self.pats = { p: i for i, p in enumerate( ps )}
+    print( self.pats )
+    self.digs = [ ''.join( sorted( d )) for d in digs ]
+  def read( self ):
+    ds = [ self.pats[ d ] for d in self.digs ]
+    return int( ''.join( str(d) for d in ds ))
+
+dsps = []
+ct1 = 0
+ct2 = 0
+with open( 'dat' ) as f:
+  for l in f:
+    l = l.strip()
+    l0, l1 = l.split('|')
+    l0 = l0.split()
+    l1 = l1.split()
+    #print( l0, l1 )
+
+    for seq in l1:
+      if len( seq ) in [ 2, 3, 4, 7 ]:
+        ct1 += 1
+
+    d = Dsp( l0, l1 )
+    ct2 += d.read()
+    dsps.append( d )
+ 
+print( 'part1', ct1 )
+print( 'part2', ct2 )
+
+# vi: ft=python

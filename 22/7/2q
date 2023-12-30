@@ -1,0 +1,62 @@
+#!/bin/python
+
+import sys
+
+datfile = sys.argv[ 1 ]
+with open( datfile ) as f:
+  lines = f.readlines()
+
+class Dir:
+  def __init__( self, name, parent ):
+   self.name, self.parent, self.size, self.kids, self.files = name, parent, 0, {}, []
+
+root = Dir( '/', None )
+pwd = root
+in_ls = False
+for line in lines:
+  line = line.strip()
+  #print( 'line', line, 'in_ls', in_ls )
+  if line.startswith( '$' ):
+    in_ls = False
+    l = line.split()
+    if l[ 1 ] == 'cd':
+      dname = l[ 2 ]
+      if dname == '/':
+        pwd = root
+      elif dname == '..':
+        pwd = pwd.parent
+        if pwd is None: x=1/0
+      else:
+        pwd = pwd.kids[ dname ]
+    else:
+      in_ls = True
+  else:
+    if not in_ls: x=1/0
+    x, y = line.split()
+    if x == 'dir':
+      dname = y
+      if dname in pwd.kids: x=1/0
+      pwd.kids[ dname ] = Dir( dname, pwd )
+    else:
+      sz, fname = int( x ), y
+      pwd.files.append(( sz, fname ))
+      d = pwd
+      while d is not None:
+        d.size += sz
+        d = d.parent
+
+def p1_iter( d, t ):
+  #print( d.name, d.size, t )
+  if d.size <= 100000:
+    t += d.size
+  for dname in d.kids:
+    t = p1_iter( d.kids[ dname ], t )
+  return t
+p1_tot = p1_iter( root, 0 )
+print( 'part1', p1_tot )
+
+disk_space = 70000000
+req_space = 30000000
+p2d = root
+def p2_iter( d ):
+  if d.size

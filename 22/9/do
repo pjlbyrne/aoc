@@ -1,0 +1,95 @@
+#!/bin/python
+
+import numpy as np
+import sys
+
+dpath = sys.argv[ 1 ]
+ll = []
+with open( dpath ) as f:
+  for l in f:
+    cmd, n = l.strip().split()
+    n = int( n )
+    my, mx = 0, 0
+    if cmd == 'L': mx = -n
+    elif cmd == 'R': mx = n
+    elif cmd == 'U': my = n
+    else: my = -n
+    ll.append(( mx, my ))
+hx, hy, tx, ty = 0, 0, 0, 0
+locs = set([( tx, ty )])
+
+#moves = {
+#    ( 0, 0 ): ( 0, 0 )
+#,   ( -2, -2 ): 
+for mx, my in ll:
+  if   mx > 0: dy, dx, m =  0,  1,  mx
+  elif mx < 0: dy, dx, m =  0, -1, -mx
+  elif my > 0: dy, dx, m =  1,  0,  my
+  else       : dy, dx, m = -1,  0, -my
+  for i in range( m ):
+      hx += dx
+      hy += dy
+      #print( hx, hy )
+      #if hx == tx:
+      #  dy = hy - ty
+      #  if abs( dy ) == 2: ty += dy / 2
+      #elif hy == ty:
+      #  dx = hx - tx
+      #  if abs( dx ) == 2: tx += dx / 2
+      #else:
+
+      ddy = hy - ty
+      ddx = hx - tx
+      #print( 'ddy', ddy, 'ddx', ddx )
+      if abs( ddy ) == 2:
+        ty += ddy // 2
+        tx += ddx
+      if abs( ddx ) == 2:
+        ty += ddy
+        tx += ddx // 2
+
+      locs.add(( tx, ty ))
+
+print( 'part1', len( locs ))
+
+locs = set()
+s = [( 0, 0 ) for i in range( 10 )]
+for mx, my in ll:
+
+  if   mx > 0: sy, sx, m =  0,  1,  mx
+  elif mx < 0: sy, sx, m =  0, -1, -mx
+  elif my > 0: sy, sx, m =  1,  0,  my
+  else       : sy, sx, m = -1,  0, -my
+  for i in range( m ):
+ 
+    hx, hy = s[ 0 ]
+    hx += sx
+    hy += sy
+    s[ 0 ] = ( hx, hy )
+    for si in range( 1, 10 ):
+
+      tx, ty = s[ si ]
+      dx = hx - tx
+      dy = hy - ty
+      if abs( dy ) == 2 and abs( dx ) == 2:
+        ty += dy // 2
+        tx += dx // 2
+      elif abs( dy ) == 2:
+        ty += dy // 2
+        tx += dx
+      elif abs( dx ) == 2:
+        ty += dy
+        tx += dx // 2
+      s[ si ] = ( tx, ty )
+      hx, hy = tx, ty
+
+      #print( si, s )
+      #input()
+
+    locs.add( s[ 9 ])
+
+  #print( s )
+  #input()
+
+print( 'part2', len( locs )) # 206 low, 586 low
+

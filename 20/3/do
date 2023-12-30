@@ -1,0 +1,59 @@
+#!/bin/python
+
+from math import gcd
+def lcm( n, m ):
+  return ( n * m ) / gcd( n, m )
+
+n = 0
+x = 0
+#W = 0
+N = 0
+if False:
+    with open( 'dat' ) as f:
+        for l in f:
+            l = l.strip()
+            w = len( l )
+            #if W = 0: W = lcm( 3, dx )
+            h = l[ x ] == '#'
+            if h: N += 1
+            #print( '{}{}{}'.format( l[ : x ], 'X' if h else 'O', l[ x + 1 : ]))
+            x = ( x + 3 ) % w
+            n += 1
+            #if n > 10: exit(0)
+
+Ns = []
+slopes = [ (1,1), (3,1), (5,1), (7,1), (1,2) ]
+for dx, dy in slopes:
+    #print( dx, dy )
+    iy = 0
+    x = 0
+    N = 0
+    n = 0
+    print()
+    with open( 'dat' ) as f:
+        for l in f:
+
+            l = l.strip()
+            w = len( l )
+
+            if iy == 0:
+                h = l[ x ] == '#'
+                if h: N += 1
+                print( '{}{}{}'.format( l[ : x ], 'X' if h else 'O', l[ x + 1 : ]))
+                iy = dy
+                x = ( x + dx ) % w
+            else:
+                print( l )
+            iy -= 1
+
+            n += 1
+
+        Ns.append( N )
+
+print( Ns )
+t = 1
+for N in Ns:
+    t = t * N
+
+print( t )
+

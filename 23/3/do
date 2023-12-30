@@ -1,0 +1,83 @@
+#!/bin/python
+
+src = 'd0'
+src = 'dat'
+
+cols = [ 'blue', 'green', 'red' ]
+cr, cg, cb = 12, 13, 14
+
+import sys
+t = int( sys.argv[ 1 ]) if len( sys.argv ) == 2 else None
+gears = {}
+
+def do_num( j, l0, l1, l2, i0, i1 ):
+  n = int( l1[ i0: i1 ])
+  i0 = max( i0 - 1, 0 )
+  i1 = min( i1, len( l1 ))
+  s= '{}|{}|{}|{}'.format(
+    l0[ i0: i1 + 1 ] if l0 else ''
+  , l1[ i0 ] if l1 and i0 > 0 else ''
+  , l1[ i1 ] if l1 and i1  < len( l1 ) else ''
+  , l2[ i0: i1 + 1 ] if l2 else ''
+  )
+  part = any( c not in '.|' for c in s )
+  if n == t:
+    print( n, part, s, i0, i1 )
+    print( l0 )
+    print( l1 )
+    print( l2 )
+    print()
+  if '*' in s:
+    if l0 and '*' in l0[ i0: i1 + 1 ]:
+      i = l0[ i0: i1 + 1 ].find( '*' )
+      pos = ( j - 1, i0 + i )
+    if i0 >= 0 and l1[ i0 ] == '*':
+      pos = ( j, i0 )
+    if i1 < len( l1 ) and l1[ i1 ] == '*':
+      pos = ( j, i1 )
+    if l2 and '*' in l2[ i0: i1 + 1 ]:
+      i = l2[ i0: i1 + 1 ].find( '*' )
+      pos = ( j + 1, i0 + i )
+    if pos not in gears: gears[ pos ] = []
+    gears[ pos ].append( n )
+      
+  return n if part else 0
+
+def do_line( t1, j, l0, l1, l2 ):
+  if l1 is None: return t1
+  in_num = False
+  for i in range( len( l1 )):
+    if l1[ i ] in '0123456789':
+      if not in_num:
+        in_num = True
+        i0 = i
+    else:
+      if in_num:
+        in_num = False
+        t1 += do_num( j, l0, l1, l2, i0, i )
+  if in_num:
+    t1 += do_num( j, l0, l1, l2, i0, len( l1 ))
+  return t1
+
+t1 = 0
+l0 = None
+l1 = None
+j = -1
+with open( src ) as f:
+  for l2 in f:
+    l2 = l2.strip()
+    t1 = do_line( t1, j, l0, l1, l2 )
+    l0 = l1
+    l1 = l2
+    j += 1
+t1 = do_line( t1, j, l0, l1, None )
+
+print( 'part1', t1 ) # 508657 too high, 482077 too low
+
+t2 = 0
+for pos in gears:
+  vals = gears[ pos ]
+  if len( vals ) == 2:
+    t2 += vals[ 0 ] * vals[ 1 ]
+#print( gears )
+print( 'part2', t2 )

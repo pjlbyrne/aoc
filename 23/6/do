@@ -1,0 +1,51 @@
+#!/bin/python
+
+from math import prod
+
+src = 'd0'
+src = 'dat'
+
+import sys
+t = int( sys.argv[ 1 ]) if len( sys.argv ) == 2 else None
+
+with open( src ) as f:
+
+  l = f.readline()
+  l = l.split(':')[1]
+  ts = [ int( x ) for x in l.split() ]
+
+  l = f.readline()
+  l = l.split(':')[1]
+  ds = [ int( x ) for x in l.split() ]
+
+ns = []
+for t, d in zip( ts, ds ):
+  ct = 0
+  for i in range( t ):
+    if i * ( t - i ) > d: ct += 1
+  ns.append( ct )
+
+print( 'part1', prod( ns ))
+
+with open( src ) as f:
+
+  l = f.readline()
+  l = l.split(':')[1]
+  ts = [ int( ''.join( l.split() ))]
+
+  l = f.readline()
+  l = l.split(':')[1]
+  ds = [ int( ''.join( l.split() ))]
+
+ns = []
+i0 = 0
+for t, d in zip( ts, ds ):
+  ct = 0
+  for i in range( t ):
+    if i * ( t - i ) > d: ct += 1
+    if i - i0 > 100:
+      print( i )
+      i0 = i
+  ns.append( ct )
+
+print( 'part2', prod( ns ))

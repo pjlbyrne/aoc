@@ -1,0 +1,54 @@
+#!/bin/python
+
+map = []
+routes = []
+with open( 'd0' ) as f:
+    l = f.readline().strip()
+    arr = int( l )
+    l = f.readline().strip()
+    for s in l.split(','):
+      if s != 'x': s = int( s )
+      else: s = 0
+      routes.append( s )
+
+print( 'routes', routes )
+
+deps = []
+min_dep = arr + max( routes )
+min_route = None
+for r in routes:
+    t = 0
+    if r == 0: continue
+    while t < arr: t += r
+    deps.append( t )
+    if t < min_dep: min_dep, min_route = t, r
+
+print( l )
+wait = min_dep - arr
+print( 'arr', arr )
+print( 'min_dep', min_dep )
+print( 'wait', wait )
+print( 'min_route', min_route )
+print( 'part1', wait * min_route )
+
+times = [ 0 for x in routes ]
+print( 'times', times )
+while True:
+  t += r
+  for i, r in enumerate( routes ):
+    #print( 'i', i, 'r', r )
+    t0 = times[ 0 ] + r
+    if i == 0:
+      times[ 0 ] = t0
+    elif r > 0:
+      tx = times[ i ]
+      while tx + r < t0: tx += r
+      times[ i ] = tx
+  if times[ 0 ] >= 1068781:
+    print( times )
+    exit( 0 )
+
+  #if ( t + 1 ) % routes[ i+1 ] == 0:
+
+#print( part2( 0, 0 ))
+

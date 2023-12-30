@@ -1,0 +1,23 @@
+#!/bin/python
+
+n = 0
+with open( 'dat' ) as f:
+    for l in f:
+        l = l.strip()
+        r, c, pw = l.split()
+        r0, r1  = r.split('-')
+        r0, r1 = int( r0 ) - 1, int( r1 ) - 1
+        c = c[0]
+        c0, c1 = pw[ r0 ], pw[ r1 ]
+        m0, m1 = c0 == c, c1 == c
+        m = ( m0 or m1 ) and not ( m0 and m1 )
+        #print( m0, m1, m )
+        #print( '{:5} {}, {}:{}, {}'.format( m, c, c0, c1, pw ) )
+        if m: n += 1
+        #if n > 10: exit(0)
+        #ct = pw.count( c )
+        #if ct >= r0 and ct <= r1: n += 1
+        #print( r0, r1, c, pw )
+
+print( n )
+

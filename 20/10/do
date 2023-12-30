@@ -1,0 +1,59 @@
+#!/bin/python
+
+from math import prod
+
+nums = [ 0 ]
+with open( 'da' ) as f:
+    for l in f:
+        l = l.strip()
+        n = int( l )
+        nums.append( n )
+
+max_num = max( nums )
+nums.append( max_num + 3 )
+nums = sorted( nums )
+print( 'nums', nums )
+
+
+diffs = []
+_n = None
+ct1, ct3 = 0, 0
+for n in nums:
+    if _n is not None:
+        d = n - _n
+        diffs.append( n - _n )
+        if d == 1:
+            ct1 += 1
+        elif d == 3:
+            ct3 += 1
+    _n = n
+
+print( 'diffs', diffs )
+print( 'ct1', ct1, 'ct3', ct3, 'ct1*ct3', ct1*ct3 )
+
+# 1111 211 22 121 31 13 112
+# 111 21 12 3
+# 11 2
+# 1111: 7, 111: 4, 11: 2
+
+sts = []
+i0 = -1
+facs = []
+for i in range( 1, len( diffs )):
+    d = i - i0 - 1
+    if diffs[ i ] == 3:
+        sts.append( d )
+        if d == 4:
+            facs.append( 7 )
+        elif d == 3:
+            facs.append( 4 )
+        elif d == 2:
+            facs.append( 2 )
+        #print( i, i0, d )
+        i0 = i
+
+print( 'sts', sts )
+
+print( 'facs', facs )
+
+print( 'prod', prod( facs ))

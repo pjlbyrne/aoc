@@ -1,0 +1,29 @@
+#!/bin/python
+
+t, t1, t2, t3 = 0, 0, 0, 0
+with open( 'dat' ) as f:
+    for l in f:
+        l = l.strip()
+        if l:
+            t += int(l)
+        else:
+            if t > t3:
+                t1 = t2
+                t2 = t3
+                t3 = t
+            elif t > t2:
+                t1 = t2
+                t2 = t
+            elif t > t1:
+                t1 = t
+            t = 0
+if t > t3:
+    t1 = t2
+    t2 = t3
+    t3 = t
+elif t > t2:
+    t1 = t2
+    t2 = t
+elif t > t1:
+    t1 = t
+print( 't123', t1+t2+t3 )

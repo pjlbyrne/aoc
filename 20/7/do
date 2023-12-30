@@ -1,0 +1,57 @@
+#!/bin/python
+
+dads = {}
+kids = {}
+with open( 'da' ) as f:
+    for l in f:
+        l = l.strip()
+        if l.endswith( 'no other bags.' ):
+            continue
+        l = l.split()
+        clr = '{} {}'.format( l[ 0 ], l[ 1 ])
+        L = len( l )
+        i = 4
+        k = []
+        kids[ clr ] = k
+        while i < L:
+            _n, _clr = l[ i ], '{} {}'.format( l[ i+1 ], l[ i+2 ])
+            if clr == 'mirrored bronze':
+                print( clr, _n, _clr )
+            if _clr in dads:
+                dads[ _clr ].add( clr )
+            else:
+                dads[ _clr ] = set([ clr ])
+            k.append(( int( _n ), _clr ))
+
+            #print( dads[ _clr ])
+            i += 4
+            if clr == 'mirrored bronze':
+                print( i, L )
+
+tgts = set()
+def walk( clr ):
+
+    tgts.add( clr )
+    if clr not in dads:
+        #print( clr, [])
+        return
+    #print( clr, dads[ clr ])
+    for parent in dads[ clr ]:
+        tgts.add( parent )
+        walk( parent )
+
+def walk_kids( clr, ct ):
+
+    if clr not in kids: return ct
+    for n, _clr in kids[ clr ]:
+        ct += n * walk_kids( _clr, 1 )
+    return ct
+
+walk( 'shiny gold' ) 
+#print( dads )
+print( tgts )
+print( len( tgts ))
+print( walk_kids( 'shiny gold', 0 )) # 437 too low
+
+# not 12, 19
+

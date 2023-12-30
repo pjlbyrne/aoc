@@ -1,0 +1,57 @@
+#!/bin/python
+
+idx = { i: [] for i in range( 100 )}
+
+class Board:
+  def __init__( self, bi, idx, _rows ):
+    self.bi = bi
+    l = []
+    for r in _rows:
+        l.append([ int( x ) for x in r.split() ])
+    self.rows = l
+    self.tot = sum([ sum( r ) for r in l ])
+    self.res = self.tot
+    self.hits = [[ False ] * 5 for _ in range( 5 )]
+    for r in l:
+      for n in r:
+        idx[ n ].append( self )
+  def __repr__( self ):
+    return '{}, {}'.format( self.tot, self.rows )
+  def hit( self, d ):
+
+    for r, rh in zip( self.rows, self.hits ):
+      for i, x in enumerate( r ):
+        if x == d:
+          rh[ i ] = True
+          self.res -= d
+          if all( h for h in rh ):
+            return True
+          if all( rh[ i ] for rh in self.hits ):
+            return True
+          return False
+
+draws = []
+boards = []
+with open( 'dat' ) as f:
+
+  def read():
+    for l in f:
+      return l.strip()
+
+  draws = [ int( x ) for x in read().split(',') ]
+
+  bi = 0
+  while( l := read() is not None ):
+    boards.append( Board( bi, idx, [ read(), read(), read(), read(), read() ]))
+    bi += 1
+
+ct = 0
+for d in draws:
+    for b in idx[ d ]:
+        if b.hit( d ):
+          #print( 'part1', d * b.res )
+          #exit()
+          print( 
+
+# 65660 high
+# 63259 low

@@ -1,0 +1,58 @@
+#!/bin/python
+
+import itertools as it
+import numpy as np
+import parse
+import sys
+
+dpath = sys.argv[ 1 ]
+
+x0, y0, x1, y1 = 0, 0, 0, 0
+walls = []
+pc = parse.compile( 'Sensor at x={:d}, y={:d}: closest beacon is at x={:d}, y={:d}\n' )
+sensors = []
+with open( dpath ) as f:
+  for l in f:
+
+    res = pc.parse( l )
+    sx, sy, bx, by = res[ 0 ], res[ 1 ], res[ 2 ], res[ 3 ]
+    bm = abs( sx - bx ) + abs( sy - by )
+    sensors.append(( sx, sy, bx, by, bm ))
+
+    x0 = min( x0, sx - bm )
+    x1 = max( x1, sx + bm )
+    y0 = min( y0, sy - bm )
+    y1 = max( y1, sy + bm )
+
+print( 'x0: {}, x1: {}, y0: {}, y1: {}'.format( x0, x1, y0, y1 ))
+
+for s0, s1 in it.combinations( sensors, 2 ):
+  sx0, sy0, bx0, by0, bm0 = s0
+  sx1, sy1, bx1, by1, bm1 = s1
+  smd = abs( sx0 - sx1 ) + abs( sy0 - sy1 )
+  if abs( smd - bm0 - bm1 ) == 2:
+    tx = sx0 + ( sx1 - sx0 ) * bm0 // ( bm0 + bm1 + 2 )
+    ty = sy0 + ( sy1 - sy0 ) * bm0 // ( bm0 + bm1 + 2 )
+    print( s0, s1, tx, ty, tx * 4000000 + ty )
+    #print( tx, ty, tx * 4000000 + ty )
+  #print( smd, bm0 + bm1, abs( smd - ( bm0 + bm1 )))
+
+exit()
+
+ty = 10 if dpath == 'd0' else 2000000
+print( 'ty', ty )
+ct = 0
+for tx in range( x0, x1 + 1 ):
+
+  for sx, sy, bx, by, bm in sensors:
+    tm = abs( tx - sx ) + abs( ty - sy )
+
+    # if this point is within the sensors manhattan distance and not on its beacon
+    if tm <= bm and ( tx, ty ) != ( bx, by ):
+      ct += 1
+      break
+
+print( 'part1', ct ) # 4403085 low
+
+# 13680211232023 high
+# 13704503267076 high

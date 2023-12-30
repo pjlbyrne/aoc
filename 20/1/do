@@ -1,0 +1,21 @@
+#!/bin/python
+
+nums = []
+with open( 'dat' ) as f:
+    for l in f:
+       nums.append( int( l.strip() ))
+nums = sorted( nums )
+
+print( nums )
+
+for n in nums:
+    for m in nums:
+        for o in nums:
+
+            t = n + m + o
+            if t == 2020:
+                print( 'n: {}, m: {}, o: {}'.format( n, m, o ))
+                exit( 0 )
+
+            elif t > 2020:
+                break

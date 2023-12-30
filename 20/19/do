@@ -1,0 +1,67 @@
+#!/bin/python
+
+import copy
+
+fname = 'dc'
+
+rules = {}
+
+def do_match( fits, s, i0 ):
+
+  if i0 >= len( s ):
+    return False, 0
+
+  if type( fits ) is str:
+    if fits == s[ i0 ]:
+      return True, i0 + 1
+    else:
+      return False, 0
+
+  for f in fits:
+    ok = True
+    i1 = i0
+    for x in f:
+      m, i2 = do_match( rules[ x ], s, i1 )
+      if not m:
+        break
+      i1 = i2
+    if m:
+      return True, i1
+  return False, 0
+
+tot1 = 0
+with open( fname ) as f:
+
+  do_rules = True
+  for l in f:
+    
+    l = l.strip()
+    if not l:
+      do_rules = False
+      continue
+
+    if do_rules:
+      x1, x2 = l.split( ':' )
+      n = int( x1 )
+      if n in rules: x=1/0
+      x2 = x2.split( '|' )
+      if '"' in x2[ 0 ]:
+        s = x2[ 0 ].strip()
+        rules[ n ] = s[ 1: -1 ]
+      else:
+        fits = []
+        for x3 in x2:
+          fits.append([ int(s) for s in x3.split() ])
+        rules[ n ] = fits
+      #print( n, rules[ n ])
+
+    else:
+      ok, n = do_match( rules[ 0 ], l, 0 )
+      #print( n, len( l ))
+      if ok and n == len( l ):
+        tot1 += 1
+        print( l )
+
+print( 'p1', tot1 ) # 126
+#print( 'p2', tot2 ) # 161 too low
+

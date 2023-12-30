@@ -1,0 +1,45 @@
+#!/bin/python
+
+d = { '[': ']', '{': '}', '(': ')', '<': '>' }
+
+tot_sc = 0
+def chk( l, i, idt, cmp ):
+  if i == len( l ): return l, i, False, cmp
+  c = l[i]
+  #print( '-i', i, 'c', c, 'idt', idt )
+  if c in [ ')', ']', '}', '>' ]: return l, i, False, cmp
+  sp  = ' ' * idt
+  def rec( l, i, c1, cmp ):
+    #print( sp, 'i', i, 'c1', c1 )
+    l, i, err, cmp = chk( l, i+1, idt+1, cmp )
+    if err: return l, i, err, cmp
+    if i == len( l ): return l, i, False, cmp
+    #print( sp, 'i', i, 'err', err )
+    if err: return l, i, err, cmp
+    if l[i] in d: l, i, err, cmp = chk( l, i, idt+1, cmp )
+    if err: return l, i, err, cmp
+    if i == len( l ): return l, i, False, cmp
+    #print( sp, 'i', i, 'l[i]', l[i], 'c1', c1 )
+    if l[i] != c1:
+      global tot_sc
+      tot_sc += { ')': 3, ']': 57, '}': 1197, '>': 25137 }[ l[i] ]
+      cmp.append( c1 )
+    return l, i+1, l[i] != c1, cmp
+
+  return rec( l, i, d[c], cmp )
+
+g = []
+with open( 'd0' ) as f:
+#ith open( 'dat' ) as f:
+  for l in f:
+    l = l.strip()
+    g += l
+    l, i, err, cmp = chk( l, 0, 0, [] )
+    #print( 'err', err )
+    print( 'cmp', cmp )
+
+#print( g )
+print( 'part1', tot_sc )
+
+# vi: ft=python
+

@@ -1,0 +1,67 @@
+#!/bin/python
+
+import sys
+
+x = 1
+dpath = sys.argv[ 1 ]
+prog = []
+with open( dpath ) as f:
+  for l in f:
+    l = l.strip()
+    if l == 'noop': prog.append( 'noop' )
+    else:
+      prog.append( 'addx' )
+      prog.append( int( l.split()[ 1 ]))
+
+d = { 20: 0, 60: 0, 100: 0, 140: 0, 180: 0, 220: 0 }
+t = 0
+in_add = False
+for byt in prog:
+  t += 1
+  if t in d:
+    d[ t ] = t * x
+    #print( t, x )
+  if byt == 'addx':
+    in_add = True
+  elif in_add:
+    x += byt
+    in_add = False
+
+print( 'part1', sum( d.values() ))
+
+scr = [
+  [ ' ' for _ in range( 40 )]
+, [ ' ' for _ in range( 40 )]
+, [ ' ' for _ in range( 40 )]
+, [ ' ' for _ in range( 40 )]
+, [ ' ' for _ in range( 40 )]
+, [ ' ' for _ in range( 40 )]
+]
+#for ln in scr: print( ''.join( ln ))
+x = 1
+t = 0
+in_add = False
+pr = 0
+pc = 0
+si = -1
+for byt in prog:
+  t += 1
+
+  sc = x  % 40
+  scr[ pr ][ pc ] = '#' if abs( x - pc ) < 2 else '.'
+
+  #print( ''.join( scr[0] ), 'x', x, 'byt', byt, 'x', x, 'sc', sc, 'pc', pc )
+  #input()
+
+  if byt == 'addx':
+    in_add = True
+  elif in_add:
+    x += byt
+    in_add = False
+
+  pc += 1
+  if pc == 40:
+    pc = 0
+    pr += 1
+
+for ln in scr: print( ''.join( ln ))

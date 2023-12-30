@@ -1,0 +1,66 @@
+#!/bin/python
+
+src = 'd0'
+#src = 'dat'
+
+digs = {
+  'eight': 8
+, 'seven': 7
+, 'three': 3
+, 'nine' : 9
+, 'five' : 5
+, 'four' : 4
+, 'zero' : 0
+, 'six'  : 6
+, 'two'  : 2
+, 'one'  : 1
+, '0': 0
+, '1': 1
+, '2': 2
+, '3': 3
+, '4': 4
+, '5': 5
+, '6': 6
+, '7': 7
+, '8': 8
+, '9': 9
+}
+
+t1 = 0
+with open( src ) as f:
+  for l in f:
+     l = l.strip()
+     l = [ i for i in l if i in '0123456789' ]
+     t1 += int( l[ 0 ] + l[ -1 ])
+print( 'part1', t1 )
+
+t2 = 0
+with open( src ) as f:
+  for l in f:
+    l = l.strip()
+    d0, d1 = None, None
+    for i in range( len( l )):
+      for k in digs:
+        #print( l, l[ i: i + len( k )])
+        if l[ i: i + len( k )] == k:
+        #if l.find( k, i, i ) > 0:
+          d0 = digs[ k ]
+          #print( 'd0', d0 )
+          break
+      if d0 is not None:
+        break
+    for i in range( len( l ) - 1, -1, -1 ):
+      for k in digs:
+        #if l.find( k, i, i ) > 0:
+        if l[ i: i + len( k )] == k:
+          d1 = digs[ k ]
+          #print( 'd1', d1 )
+          break
+      if d1 is not None:
+        break
+    #print( l, d0, d1 )
+    #if d0 == 8 and d1 == 3:
+    #  exit()
+    t2 += d0 * 10 + d1
+
+print( 'part2', t2 ) # 88000 too high, 54982 too high

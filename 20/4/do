@@ -1,0 +1,81 @@
+#!/bin/python
+
+valid_fields = set([ 'byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid', 'cid' ])
+
+def is_valid( k, v ):
+    if k not in valid_fields: return False
+
+    if k == 'byr':
+        if not v.isdigit() or not len( v ) == 4: return False
+        n = int( v )
+        if n < 1920 or n > 2002: return False
+        return True
+
+    elif k == 'iyr':
+        if not v.isdigit() or not len( v ) == 4: return False
+        n = int( v )
+        if n < 2010 or n > 2020: return False
+        return True
+
+    elif k == 'eyr':
+        if not v.isdigit() or not len( v ) == 4: return False
+        n = int( v )
+        if n < 2020 or n > 2030: return False
+        return True
+
+    elif k == 'hgt':
+        if len( v ) < 3: return False
+        if v.endswith( 'cm' ):
+            n = int( v[ : -2 ])
+            if n < 150 or n > 193: return False
+            return True
+        elif v.endswith( 'in' ):
+            n = int( v[ : -2 ])
+            if n < 59 or n > 76: return False
+            return True
+        else:
+            return False
+
+    elif k == 'hcl':
+        if len( v ) != 7: return False
+        if v[ 0 ] != '#': return False
+        for c in v[ 1: ]:
+            if c not in '0123456789abcdef': return False
+        return True
+
+    elif k == 'ecl':
+        if v in [ 'amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth' ]: return True
+        return False
+
+    elif k == 'pid':
+        if len( v ) != 9: return False
+        if not v.isdigit(): return False
+        return True
+
+    elif k == 'cid':
+        return False
+
+
+n = 0
+s = set()
+with open( 'da' ) as f:
+    for l in f.readlines():
+        l = l.strip()
+        if not l:
+            #print( s )
+            if ( len( s ) == 7 and 'cid' not in s ) or len( s ) == 8: n += 1
+            s = set()
+            continue
+        for field in l.split( ' ' ):
+            #print( field, ':' in field )
+            if ':' not in field: continue
+            k, v = field.split( ':' )
+            #print( k )
+            if is_valid( k, v ):
+                s.add( k )
+if ( len( s ) == 7 and 'cid' not in s ) or len( s ) == 8:
+    n += 1
+    s = set()
+
+print( n )
+

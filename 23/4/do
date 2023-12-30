@@ -1,0 +1,35 @@
+#!/bin/python
+
+from collections import deque
+
+src = 'd0'
+src = 'dat'
+
+import sys
+t = int( sys.argv[ 1 ]) if len( sys.argv ) == 2 else None
+
+cards = {}
+t1 = 0
+with open( src ) as f:
+  for l in f:
+    l = l.strip()
+    l0, l1 = l.split( ':' )
+    _, ns = l0.split()
+    n = int( ns )
+    l0, l1 = l1.split( '|' )
+    wins = set([ int( x ) for x in l0.split() ])
+    mine = [ int( x ) for x in l1.split() ]
+    matches = sum( 1 for x in mine if x in wins )
+    if matches: t1 = t1 + 2 ** ( matches - 1 )
+    cards[ n ] = wins, mine, matches
+
+print( 'part1', t1 )
+
+cts = [ 1 for n in cards ]
+for n in cards:
+  ct = cts[ n - 1 ]
+  wins, mine, matches = cards[ n ]
+  for i in range( n, n + matches ):  
+    cts[ i ] = cts[ i ] + ct
+
+print( 'part2', sum( cts ))

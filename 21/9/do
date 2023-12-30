@@ -1,0 +1,59 @@
+#!/bin/python
+
+grid = []
+with open ( 'dat' ) as f:
+  for l in f:
+    grid.append( l.strip() )
+
+w = len(grid[0]) - 1
+h = len(grid) - 1
+print( 'h', h, 'w', w )
+tot_risk = 0
+low_ct = 0
+lps = []
+for ir, r in enumerate( grid ):
+  #print( c, l )
+  for ic, c in enumerate( r ):
+    ci = int(c)
+    #print( ir, ic )
+    low = True
+    if ic > 0 and int(r[ic-1])        <= ci: low = False
+    if ic < w and int(r[ic+1])        <= ci: low = False
+    if ir > 0 and int(grid[ir-1][ic]) <= ci: low = False
+    if ir < h and int(grid[ir+1][ic]) <= ci: low = False
+    if low:
+      low_ct += 1
+      tot_risk += ci + 1
+      lps.append(( ir, ic ))
+
+print( 'low_ct', low_ct )
+print( 'part1', tot_risk ) # 1588 high
+
+g = []
+for r in grid:
+  g.append( list( r ))
+
+bss = []
+def nbr( sz, ir, ic ):
+  v  = g[ir][ic]
+  if v == '*' or v == '9': return sz
+  sz += 1
+  g[ir][ic] = '*'
+  if ir > 0: sz = nbr( sz, ir-1, ic )
+  if ic > 0: sz = nbr( sz, ir, ic-1 )
+  if ir < h: sz = nbr( sz, ir+1, ic )
+  if ic < w: sz = nbr( sz, ir, ic+1 )
+  return sz
+
+for ir, ic in lps:
+  print( 'ir', ir, 'ic', ic )
+  bs = nbr( 0, ir, ic )
+  bss.append( bs )
+
+bss = sorted( bss )
+print( 'bss', bss )
+print( '-1', bss[-1])
+print( '-2', bss[-2])
+print( '-3', bss[-3])
+print( 'part2', bss[-1] * bss[-2] * bss[-3])
+# vi: ft=python

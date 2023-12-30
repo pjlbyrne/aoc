@@ -1,0 +1,32 @@
+#!/bin/python
+
+import more_itertools
+
+tot = 0
+sc = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+def dat_iter():
+    with open( 'dat' ) as f:
+        for l in f:
+            l = l.strip()
+            yield l
+
+for l in dat_iter():
+        n = len( l )
+        n = n // 2
+        s1, s2 = l[ : n ], l[ n : ]
+        i = set.intersection( set( s1 ), set( s2 ))
+        c = next( iter( i ))
+        pri = sc.find( c ) + 1
+        tot += pri
+print( 'part1', tot )
+
+tot = 0
+with open( 'dat' ) as f:
+  for l in more_itertools.chunked( f, 3 ):
+    l0, l1, l2 = l[ 0 ].strip(), l[ 1 ].strip(), l[ 2 ].strip()
+    s0, s1, s2 = set( l0 ), set( l1 ), set( l2 )
+    i = set.intersection( s0, s1, s2 )
+    c = next( iter( i ))
+    tot += sc.find( c ) + 1
+print( 'part1', tot )
+

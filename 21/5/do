@@ -1,0 +1,52 @@
+#!/bin/python
+
+grid = []
+for r in range( 990 ):
+  grid.append( [ 0 ] * 990 )  
+
+rmax, cmax = 0, 0
+with open( 'dat' ) as f:
+
+  for l in f:
+    l = l.strip()
+    p0, _, p1 = l.split()
+    p0r, p0c = p0.split(',')
+    p1r, p1c = p1.split(',')
+    p0r, p0c, p1r, p1c = int( p0r ), int( p0c ), int( p1r ), int( p1c )
+    rmax = max( rmax, p0r )
+    rmax = max( rmax, p1r )
+    cmax = max( cmax, p0c )
+    cmax = max( cmax, p1c )
+    #print( 'ps', p0r, p0c, p1r, p1c )
+
+    if p0r == p1r:
+      for c in range( min( p0c, p1c ), max( p0c, p1c ) + 1 ):
+        grid[ p0r ][ c ] += 1
+    elif p0c == p1c:
+      for r in range( min( p0r, p1r ), max( p0r, p1r ) + 1 ):
+        grid[ r ][ p0c ] += 1
+    else:
+      if True:
+        if p0r < p1r:
+          dc = 1 if p0c < p1c else -1
+          c = p0c
+          for r in range( p0r, p1r + 1 ):
+            grid[ r ][ c ] += 1
+            c += dc
+        elif p1r < p0r:
+          c = p1c
+          dc = 1 if p1c < p0c else -1
+          for r in range( p1r, p0r + 1 ):
+            grid[ r ][ c ] += 1
+            c += dc
+
+ct = 0
+for row in grid:
+  #print( row )
+  for cell in row:
+    if cell > 1:
+      ct += 1
+print( 'rmax', rmax, 'cmax', cmax )
+print( 'ct', ct ) # 948560 high, 18445 low
+
+

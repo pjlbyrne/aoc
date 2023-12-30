@@ -1,0 +1,152 @@
+#!/bin/python
+
+from collections import deque
+
+src = 'd0'
+src = 'dat'
+
+import sys
+t = int( sys.argv[ 1 ]) if len( sys.argv ) == 2 else None
+
+maps = []
+map_srcs = {}
+map_dsts = {}
+
+class Range:
+  def __init__( self, d0, s0, n ):
+    self.d0, self.d1, self.s0, self.s1 = d0, d0 + n, s0, s0 + n
+    self.n = n
+  def __repr__( self ):
+    return '[{}:{})->[{}:{})'.format( self.s0, self.s1, self.d0, self.d1 )
+
+class Map:
+  def __init__( self, src, dst ):
+    self.src, self.dst = src, dst
+    self.ranges = []
+    maps.append( self )
+    map_srcs[ src ] = self
+    map_dsts[ dst ] = self
+  def __repr__( self ):
+    return '{}-to-{}: {}'.format( self.src, self.dst, self.ranges )
+  def sort_ranges( self ):
+    d = {}
+    for r in self.ranges:
+      d[ r.s0 ] = r
+    l = []
+    for s0 in sorted( d ):
+      l.append( d[ s0 ])
+    self.ranges = l
+  def map( self, x ):
+    for r in self.ranges:
+      if x >= r.s0 and x < r.s0 + r.n:
+        return r.d0 + x - r.s0
+    return x
+  def map_interval( self, i0, i1 ):
+    l = []
+    it = iter( self.ranges )
+    r = next( it )
+    print( '+ i0', i0, 'i1', i1, 'ranges', [ r for r in self.ranges ])
+    while i0 < i1:
+      print( '- i0', i0, 'i1', i1, 'r', r )
+
+      # no more ranges - interval is mapped straight
+      if r is None:
+        print( 1001 )
+        l.append(( i0, i1 )); i1 = i0
+
+      # interval starts after end of current range - get next range
+      elif i0 >= r.s1:
+        r = next( it, None )
+        continue
+
+      # interval starts in current range
+      elif i0 >= r.s0 and i0 < r.s1:
+
+        # interval is contained in current range
+        if i1 <= r.s1:
+          print( 1002 )
+          l.append(( r.d0 + i0 - r.s0, r.d0 + i1 - r.s0 )); i0 = i1
+
+        # interval is partly in current range
+        else:
+          print( 1003 )
+          l.append(( r.d0 + i0 - r.s0, r.d0 + r.s1 - r.s0 )); i0 = r.s1
+
+      # interval starts before current range
+      else:
+
+        # interval ends after current range - 
+        if i1 >= r.s1:
+          print( 1004 )
+          l.append(( r.d0 + i0 - r.s0, r.d0 + r.s1 - r.s0 )); i0 = r.s1
+          l.append(( i0, r.s0 )); i0 = r.s0
+          
+        # interval ends in current range
+        elif i1 > r.s0:
+          print( 1005 )
+          l.append(( i0, r.s0 )); i0 = r.s0
+          l.append(( r.d0 + i0 - r.s0, r.d0 + i1 - r.s0 )); i0 = i1
+
+        # interval ends before current range
+        else:
+          print( 1006 )
+          l.append(( i0, i1 )); i0 = i1
+
+      print( '...  l', l )
+    print( '=== l', l )
+    #input()
+    return l
+
+seeds = []
+with open( src ) as f:
+  seeds = [ int( x ) for x in f.readline().strip().split()[ 1: ]]
+  for l in f:
+    l = l.strip()
+    if not l: continue
+    if l.endswith( 'map:' ):
+      l0, _ = l.split()
+      ws = l0.split( '-' )
+      m = Map( ws[ 0 ], ws[ 2 ])
+    else:
+      l = l.split()
+      l = [ int( i ) for i in l ]
+      d0, s0, n = int( l[ 0 ]), int( l[ 1 ]), int( l[ 2 ])
+      r = Range( d0, s0, n )
+      m.ranges.append( r )
+
+for src in map_srcs:
+  m = map_srcs[ src ]
+  m.sort_ranges()
+  #print( m.ranges )
+
+cur = 'seed'
+l = [ x for x in seeds ]
+while cur in map_srcs:
+  m = map_srcs[ cur ]
+  print( 'map', m )
+  _l = [ m.map( x ) for x in l ]
+  #print( _l )
+  cur = m.dst
+  l = _l
+  
+print( 'part1', min( l ))
+
+l = []
+it = iter( seeds )
+for i0 in it:
+  n = next( it )
+  l.append(( i0, i0 + n ))
+
+cur = 'seed'
+while cur in map_srcs:
+  print( '\n>>> l', l )
+  m = map_srcs[ cur ]
+  _l = []
+  for i0, i1 in l:
+    _l.extend( m.map_interval( i0, i1 ))
+  cur = m.dst
+  l = _l
+
+i0s = [ i0 for i0, i1 in l ]
+
+print( 'part2', min( i0s ))

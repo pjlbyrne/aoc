@@ -1,0 +1,61 @@
+#!/bin/python
+
+fname = 'da'
+
+mem = {}
+with open( fname ) as f:
+  for l in f:
+    l = l.strip()
+    k, _, v = l.split()
+    #print( k, v )
+    if k == 'mask':
+      m0 = int( v.replace( 'X', '0' ), 2 )
+      m1 = int( v.replace( 'X', '1' ), 2 )
+      #print( 'm0:  {:036b}'.format( m0 ))
+      #print( 'm1:  {:036b}'.format( m1 ))
+    else:
+      addr = int( k[ 4 : -1 ])
+      data = int( v )
+      #print( '\n{:036b}\n{:036b}\n{:036b}\n{:036b}'.format( data, data | m0, data & m1, ( data | m0 ) & m1 ))
+      mem[ addr ] = ( data | m0 ) & m1
+
+tot = sum( v for v in mem.values() )
+print( 'part1', tot )
+
+
+def xiter( xaddr ):
+
+    pos = xaddr.find( 'X' )
+    if pos < 0:
+      yield xaddr
+      return
+    xaddr0 = xaddr[ : pos ] + '0' + xaddr[ pos + 1 : ]
+    for addr in xiter( xaddr0 ):
+      yield addr
+    xaddr1 = xaddr[ : pos ] + '1' + xaddr[ pos + 1 : ]
+    for addr in xiter( xaddr1 ):
+      yield addr
+
+mem = {}
+with open( fname ) as f:
+  for l in f:
+    l = l.strip()
+    k, _, v = l.split()
+    if k == 'mask':
+      mask = v
+    else:
+      addr = int( k[ 4 : -1 ])
+      data = int( v )
+      saddr = '{:036b}'.format( addr )
+
+      l = []
+      for c0, c1 in zip( saddr, mask ):
+        c = 'X' if c1 == 'X' else '1' if c1 == '1' else c0
+        l.append( c )
+      xaddr = ''.join( l )
+      #print( 'addr: {}\nsaddr: {}\n mask: {}\nxaddr: {}'.format( addr, saddr, mask, xaddr ))
+      for addr in xiter( xaddr ):
+        mem[ int( addr, 2 )] = data
+
+print( 'tot', sum( x for x in mem.values() ))
+

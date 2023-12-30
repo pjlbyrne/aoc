@@ -1,0 +1,77 @@
+#!/bin/python
+
+import numpy as np
+import sys
+
+dpath = sys.argv[ 1 ]
+
+mx, my = 0, 0
+walls = []
+with open( dpath ) as f:
+  for l in f:
+    l = l.strip()
+    if l.startswith( '#' ): continue
+    l = l.split( ' -> ' )
+    _l = []
+    for s in l:
+      x, y = s.split(',')
+      x, y = int( x ), int( y )
+      mx = max( x, mx )
+      my = max( y, my )
+      _l.append(( x, y ))
+    print( _l )
+    walls.append( _l )
+
+print( 'mx', mx, 'my', my )
+H = 1 + my
+W = 1 + mx + 2 * my
+M = np.zeros(( H, W ), np.int8 )
+Z = np.zeros(( 1, W ), np.int32 )
+
+# draw the walls on the map
+for wall in walls:
+  ox, oy = None, None
+  for x, y in wall:
+    if ox is not None:
+      if x == ox:
+        if y > oy:
+          for iy in range( oy, y + 1 ):
+            M[ iy, x ] = 1
+            #print( iy, x )
+        else:
+          for iy in range( y, oy + 1 ):
+            M[ iy, x ] = 1
+            #print( iy, x )
+      else:
+        if x > ox:
+          for ix in range( ox, x + 1 ):
+            M[ y, ix ] = 1
+            #print( y, ix )
+        else:
+          for ix in range( x, ox + 1 ):
+            M[ y, ix ] = 1
+            #print( y, ix )
+    ox, oy = x, y
+#print( M[:,490:510] )
+#exit()
+
+ns = 0
+sx, sy = 500, 0
+while sy < H - 1:
+  
+  #print( 'sy', sy, 'sx', sx )
+  if M[ sy + 1, sx ] == 0:
+    sy += 1 
+  elif M[ sy + 1, sx - 1 ] == 0:
+    sy += 1
+    sx -= 1
+  elif M[ sy + 1, sx + 1 ] == 0:
+    sy += 1
+    sx += 1
+  else:
+    M[ sy, sx ] = 2
+    #print( M[:,494:504] ); input()
+    sx, sy = 500, 0
+    ns += 1
+
+print( 'part1', ns )

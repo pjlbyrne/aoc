@@ -1,0 +1,73 @@
+#!/bin/python3
+
+src = 'd2'
+src = 'dat'
+
+nodes = {}
+lnodes = []
+with open( src ) as f:
+  steps = f.readline().strip()
+  print( 'steps', steps )
+  f.readline()
+
+  it = iter( f )
+  for l in it:
+    l = l.strip()
+    n, nlr = l.split( '=' )
+    n, nlr = n.strip(), nlr.strip()
+    nlr = nlr[ 1: -1 ]
+    nl, nr = nlr.split( ',' )
+    nr = nr[ 1: ]
+    nodes[ n ] = nl, nr
+    lnodes.append(( n, nl, nr ))
+    #print( '{} = ({}, {})'.format( n, nl, n ))
+
+if False:
+    cur = 'AAA'
+    si = 0
+    ct = 0
+    while cur != 'ZZZ':
+      nl, nr = nodes[ cur ]
+      s = steps[ si ]
+      si += 1
+      if si == len( steps ): si = 0
+      cur = nl if s == 'L' else nr
+      ct += 1
+
+    print( 'part1', ct )
+
+curs = [ n for n, nl, nr in lnodes if n.endswith( 'A' )]
+
+print( 'curs', curs )
+
+si = 0
+ct = 0
+while True:
+  s = steps[ si ]
+  l = []
+  na, nz = 0, 0
+  for cur in curs:
+    nl, nr = nodes[ cur ]
+    c = nl if s == 'L' else nr
+    if c.endswith( 'Z' ): nz += 1
+    if c.endswith( 'A' ): na += 1
+    l.append( c )
+
+  si += 1
+  if si == len( steps ): si = 0
+  ct += 1
+  curs = l
+  if False and nz or na:
+    _l = []
+    for i in l:
+      if i.endswith( 'A' ) or i.endswith( 'Z'):
+        _l.append( i )
+      else:
+        _l.append( '   ' )
+    print( 'curs', _l )
+
+  if nz == len( curs ):
+    break
+
+
+print( 'part1', ct )

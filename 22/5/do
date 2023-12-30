@@ -1,0 +1,42 @@
+#!/bin/python
+
+import copy
+
+stx1 = [ [], [], [], [], [], [], [], [], [] ]
+stx2 = [ [], [], [], [], [], [], [], [], [] ]
+moves = []
+with open( 'dat' ) as f:
+  l = f.readline()
+  while '[' in l:
+    for i in range( 9 ):
+      c = l[ 1 + 4 * i ]
+      if c != ' ':
+        stx1[ i ].append( c )
+        stx2[ i ].append( c )
+    l = f.readline()
+
+  stx1 = [ list( reversed( l )) for l in stx1 ]
+  stx2 = [ list( reversed( l )) for l in stx2 ]
+
+  l = f.readline()
+  l = f.readline()
+  while l:
+    i += 1
+    l = l.split()
+    n, i0, i1 = int( l[ 1 ]), int( l[ 3 ]) - 1, int( l[ 5 ]) - 1
+    moves.append(( n, i0, i1 ))
+    for i in range( n ):
+        c = stx1[ i0 ].pop()
+        stx1[ i1 ].append( c )
+    l = f.readline()
+
+s = ''.join( l[ -1 ] for l in stx1 )
+print( 'part1', s )
+
+for n, i0, i1 in moves:
+  l = stx2[ i0 ][ -n : ]
+  stx2[ i0 ] = stx2[ i0 ][ : -n ]
+  stx2[ i1 ].extend( l )
+        
+s = ''.join( l[ -1 ] for l in stx2 )
+print( 'part2', s )

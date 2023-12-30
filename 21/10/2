@@ -1,0 +1,20 @@
+#!/bin/python
+
+def chk( l, i ):
+  if i == len( l ): return i, True
+  if l[i] in [ ')', ']', '}', '>' ]: return i, False
+  if l[i] == '[':
+    i, done = chk( l, i+1 )
+    if done: return i, done
+    if l[i] != ']': return i, False
+  elif l[i] == '(':
+
+g = []
+with open( 'd0' ) as f:
+  for l in f:#
+    g += l.strip()
+
+print( g )
+
+# vi: ft=python
+

@@ -1,0 +1,80 @@
+#!/bin/python
+
+import numpy as np
+import sys
+
+dpath = sys.argv[ 1 ]
+ll = []
+with open( dpath ) as f:
+  for l in f:
+    ll.append( list( l.strip() ))
+a = np.array( ll, np.int32 )
+b = np.zeros( a.shape, np.int32 )
+#print( a )
+w, h = a.shape
+for r in range( h ):
+  mht = -1
+  for c in range( w ):
+    ht = a[ r, c ]
+    if ht > mht:
+      b[ r, c ] = 1
+      mht = ht
+  mht = -1
+  for c in range( w - 1, -1, -1 ):
+    ht = a[ r, c ]
+    if ht > mht:
+      b[ r, c ] = 1
+      mht = ht
+for c in range( w ):
+  mht = -1
+  for r in range( h ):
+    ht = a[ r, c ]
+    if ht > mht:
+      b[ r, c ] = 1
+      mht = ht
+  mht = -1
+  for r in range( h - 1, -1, -1 ):
+    ht = a[ r, c ]
+    if ht > mht:
+      b[ r, c ] = 1
+      mht = ht
+#print( b )
+t = 0
+for c in range( w ):
+  for r in range( h ):
+    if b[ c, r ] == 1: t += 1
+print( 'part1', t )
+
+scm = 0
+for r in range( h ):
+  for c in range( w ):
+    ht0 = a[ r, c ]
+
+    scn = 0
+    for rr in range( r-1, -1, -1 ): # north
+      scn += 1
+      if a[ rr, c ] >= ht0: break
+
+    scw = 0
+    for cc in range( c-1, -1, -1 ): # west
+      scw += 1
+      if a[ r, cc ] >= ht0: break
+
+    sce = 0
+    for cc in range( c+1, w ): # east
+      sce += 1
+      if a[ r, cc ] >= ht0: break
+   
+    scs = 0
+    for rr in range( r+1, h ): # south
+      scs += 1
+      if a[ rr, c ] >= ht0: break
+    
+    #if r == 2 and c == 3: print( scn, scw, sce, scs )
+    sc = scn * scw * sce * scs
+    if sc > scm: scm = sc
+    b[ r, c ] = sc
+
+#print( b )
+print( 'part2', scm )
+

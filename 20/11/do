@@ -1,0 +1,117 @@
+#!/bin/python
+
+from copy import deepcopy
+
+map = []
+with open( 'da' ) as f:
+    for l in f:
+        l = l.strip()
+        map.append([ c for c in l ])
+        #print( l )
+
+h, w = len( map ), len( map[0] )
+print( 'h', h, 'w', w )
+print()
+
+def map_print( map ):
+
+  print()
+  for j, r in enumerate( map ):
+    print( ''.join( r ))
+  print()
+
+def map_advance1( map ):
+
+  _map = []
+  change = False
+  occupied = 0
+  h = len( map )
+  w = len( map[0] )
+  for j, r in enumerate( map ):
+
+    _r = []
+    for i, s in enumerate( r ):
+
+      n = 0
+      if   j > 0:
+        if i > 0   and map[j-1][i-1] == '#': n += 1
+        if             map[j-1][i  ] == '#': n += 1
+        if i < w-1 and map[j-1][i+1] == '#': n += 1 
+      if   i > 0   and map[j  ][i-1] == '#': n += 1
+      if   i < w-1 and map[j  ][i+1] == '#': n += 1
+      if   j < h -1:
+        if i > 0   and map[j+1][i-1] == '#': n += 1
+        if             map[j+1][i  ] == '#': n += 1
+        if i < w-1 and map[j+1][i+1] == '#': n += 1
+
+      if   s == 'L' and n == 0: _s = '#'
+      elif s == '#' and n >= 4: _s = 'L'
+      else                    : _s = s
+      
+      if _s != s: change = True
+      if _s == '#': occupied += 1
+
+      _r.append( _s )
+    _map.append( _r )
+  return _map, change, occupied
+
+#while True:
+#  map, change, occupied = map_advance1( map )
+#  if not change:
+#    print( 'part1', occupied ) # 2310
+#    break
+  
+def map_advance2( map ):
+
+  _map = []
+  change = False
+  occupied = 0
+  h = len( map )
+  w = len( map[0] )
+  for j, r in enumerate( map ):
+    _r = []
+
+    for i, s in enumerate( r ):    
+
+      n = 0
+
+      def step( _j, _i, dj, di ):
+        while True:
+            _j += dj
+            _i += di
+            if _j == h or _i == w or _j < 0 or _i < 0: return False
+            _s = map[ _j ][ _i ]
+            if _s == 'L': return False
+            if _s == '#': return True
+
+      if step( j, i, -1, -1 ): n += 1
+      if step( j, i, -1,  0 ): n += 1
+      if step( j, i, -1, +1 ): n += 1
+      if step( j, i,  0, -1 ): n += 1
+      if step( j, i,  0, +1 ): n += 1
+      if step( j, i, +1, -1 ): n += 1
+      if step( j, i, +1,  0 ): n += 1
+      if step( j, i, +1, +1 ): n += 1
+
+      if   s == 'L' and n == 0: _s = '#'
+      elif s == '#' and n >= 5: _s = 'L'
+      else                    : _s = s
+      
+      if _s != s: change = True
+      if _s == '#': occupied += 1
+       
+      _r.append( _s )
+
+    _map.append( _r )
+   
+  return _map, change, occupied
+
+map_print( map )
+while True:
+  map, change, occupied = map_advance2( map )
+  map_print( map )
+  if not change:
+    print( 'part2', occupied ) # 26
+    break
+  #input( 'next' )
+

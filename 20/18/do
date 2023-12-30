@@ -1,0 +1,127 @@
+#!/bin/python
+
+import copy
+
+def eval( exp ):
+
+  op, n0, n1 = None, None, None
+  for x in exp:
+    #print( 'x', x )
+    tx = type( x )
+    if tx is list:
+      if n0 is None:
+        n0 = eval( x )
+      else:
+        n1 = eval( x )
+    elif tx is int:
+      if n0 is None:
+        n0 = x
+      else:
+        n1 = x
+    elif tx is str:
+      if x == '+':
+        op = '+'
+      elif x == '*':
+        op = '*'
+      else:
+        x=1/0
+    else:
+      x=1/0
+    #print( '>', n0, op, n1 )
+    if n0 is not None and op is not None and n1 is not None:
+      if op == '+':
+        #print( 'n0 + n1 = {} + {} = {}'.format( n0, n1, n0 + n1 ))
+        n0 = n0 + n1
+        op, n1 = None, None
+      elif op == '*':
+        #print( 'n0 * n1 = {} * {} = {}'.format( n0, n1, n0 * n1 ))
+        n0 = n0 * n1
+        op, n1 = None, None
+  return n0
+
+def eval2( exp ):
+
+  #print( 'exp', exp )
+  i = 1
+  while i < len( exp ):
+    #print( '[+] i: {}, len( exp ): {}, exp: {}'.format( i, len( exp ), exp ))
+    if exp[ i ] == '*':
+      i += 2
+      continue
+    if exp[ i ] == '+':
+      n0 = exp[ i - 1 ]
+      n1 = exp[ i + 1 ]
+      if type( n0 ) is list:
+        n0 = eval2( n0 )
+      if type( n1 ) is list:
+        n1 = eval2( n1 )
+      n = n0 + n1
+      exp[ i ] = n
+      exp.pop( i + 1 )
+      exp.pop( i - 1 )
+  i = 1
+  while i < len( exp ):
+    #print( '[*] i: {}, len( exp ): {}, exp: {}'.format( i, len( exp ), exp ))
+    if exp[ i ] == '+':
+      i += 2
+      continue
+    if exp[ i ] == '*':
+      n0 = exp[ i - 1 ]
+      n1 = exp[ i + 1 ]
+      if type( n0 ) is list:
+        n0 = eval2( n0 )
+      if type( n1 ) is list:
+        n1 = eval2( n1 )
+      n = n0 * n1
+      exp[ i ] = n
+      exp.pop( i + 1 )
+      exp.pop( i - 1 )
+  #print( len( exp ), exp )
+  #print( '*', i, exp[ i ])
+  #if type( exp[ 0 ]) is list:
+  #  exp[ 0 ] = eval2( exp[ 0 ])
+  #print( 'ret', type( exp[ 0 ]), exp[ 0 ])
+  return exp[ 0 ]
+
+fname = 'da'
+tot, tot2 = 0, 0
+with open( fname ) as f:
+  o0 = ord( '0' )
+  for l in f:
+    exp0 = exp = []
+    stk = []
+    l = l.strip()
+    n = 0
+    for c in l:
+      #print( 'c', c )
+      if c in '0123456789':
+        n = n * 10 + ( ord( c ) - o0 )
+        #print( 'n', n )
+      else:
+        if n > 0:
+          exp.append( n )
+          n = 0
+        if c == ' ': continue
+        elif c == '+' or c == '*':
+          exp.append( c )
+        elif c == '(':
+          stk.append( exp )
+          exp = []
+          stk[ -1 ].append( exp )
+        elif c == ')':
+          exp = stk.pop()
+        else:
+          #print( 'oops', c )
+          x=1/0
+    if n > 0:
+      exp.append( n )
+    print( exp )
+    tot += eval( exp )
+    e2 = eval2( exp )
+    tot2 += e2
+    print( e2 )
+    #print( 'EVAL', eval2( exp ))
+
+print( 'p1', tot )
+print( 'p2', tot2 ) #  51956998117480 low
+

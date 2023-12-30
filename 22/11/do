@@ -1,0 +1,100 @@
+#!/bin/python
+
+import sys
+
+all_items = {}
+class Item:
+  def __init__( self, idx, worry ):
+    self.idx, self.worry = idx, worry
+  def __repr__( self ):
+    return str( self.worry )
+
+monkeys = {}
+class Monkey:
+  def __init__( self, idx, items, modop, testop, onpass, onfail ):
+    self.idx, self.items, self.modop, self.testop, self.onpass, self.onfail = \
+      idx, items, modop, testop, onpass, onfail
+    self.inspections = 0
+  def __repr__( self ):
+    return 'Monkey: {}, {}'.format( self.idx, self.items )
+    #return 'Monkey {} inspected items {} times'.format( self.idx, self.inspections )
+
+dpath = sys.argv[ 1 ]
+with open( dpath ) as f:
+  l = f.readline()
+  while l:
+
+    # Monkey
+    l = l.split()
+    #print( l )
+
+    idx = int( l[ 1 ][ : -1 ])
+
+    # Starting items
+    l = f.readline().split()
+    #print( l )
+    items = []
+    for x in l[ 2: ]:
+      if x.endswith( ',' ): x = x[ : -1 ]
+      item = Item( len( all_items ), int( x ))
+      items.append( item )
+      all_items[ item.idx ] = item
+
+    # Operation
+    l = f.readline().split()
+    #print( l )
+    exec( 'def fmod( old ):\n return {} {} {}'.format( l[ 3 ], l[ 4 ], l[ 5 ]))
+
+    # Test
+    l = f.readline().split()
+    #print( l )
+    exec( 'def ftst( new ):\n return ( new % {} ) == 0'.format( l[ 3 ]))
+
+    # If true
+    l = f.readline().split()
+    #print( l )
+    onpass = int( l[ 5 ])
+
+
+    # If false
+    l = f.readline().split()
+    #print( l )
+    onfail = int( l[ 5 ])
+
+    l = f.readline()
+    l = f.readline()
+
+    monkeys[ idx ] = Monkey( idx, items, fmod, ftst, onpass, onfail )
+
+#print( monkeys[ 0 ].modop( 2 ))
+#print( monkeys[ 1 ].modop( 2 ))
+#print( monkeys[ 2 ].testop( 25 ))
+
+for round in range( 20 ):
+
+  #print( '\nRound', round )
+  for imonkey in range( len( monkeys )):
+    #print( '  Monkey', imonkey )
+    monkey = monkeys[ imonkey ]
+    for item in monkey.items:
+      
+      worry = monkey.modop( item.worry )
+      #print( item.worry, worry, worry // 3, monkey.testop( worry // 3 ))
+      worry = worry // 3
+      if monkey.testop( worry ):
+        monkeys[ monkey.onpass ].items.append( item )
+      else:
+        monkeys[ monkey.onfail ].items.append( item )
+      item.worry = worry
+      monkey.inspections += 1
+
+    monkey.items = []
+
+  #for imonkey in range( len( monkeys )):
+  #  monkey = monkeys[ imonkey ]
+  #  print( monkey )
+
+l = sorted([ m.inspections for m in monkeys.values() ])
+print( l )
+print( 'part1', l[ -2 ] * l[ -1 ]) # 4720 low
+

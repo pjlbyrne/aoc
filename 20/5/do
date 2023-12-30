@@ -1,0 +1,51 @@
+#!/bin/python
+
+def decode( s ):
+
+    row =                       \
+    +   ( s[ 0 ] == 'B' ) *  64 \
+    +   ( s[ 1 ] == 'B' ) *  32 \
+    +   ( s[ 2 ] == 'B' ) *  16 \
+    +   ( s[ 3 ] == 'B' ) *   8 \
+    +   ( s[ 4 ] == 'B' ) *   4 \
+    +   ( s[ 5 ] == 'B' ) *   2 \
+    +   ( s[ 6 ] == 'B' ) *   1 \
+
+    col =                       \
+        ( s[ 7 ] == 'R' ) *   4 \
+    +   ( s[ 8 ] == 'R' ) *   2 \
+    +   ( s[ 9 ] == 'R' ) *   1 \
+
+    return row, col
+
+
+#plan = [[ None, None, None, None, None, None, None, None ] for i in range( 128 )]
+plan = []
+for r in range( 128 ):
+    row = []
+    for c in range( 8 ):
+        row.append( ' ' )
+    plan.append( row )
+
+max_id = 0
+ids = []
+with open( 'da' ) as f:
+
+    for l in f:
+        l = l.strip()
+        r, c = decode( l )
+        id = r * 8 + c
+        #print( '{} {} {}'.format( r, c, id ))
+        if id > max_id: max_id = id
+        ids.append( id )
+        plan[ r ][ c ] = '1'
+
+#print( max_id )
+
+#print( sorted( ids ))
+
+for r, row in enumerate( plan ):
+#    print( row )
+    s = '{}{}{}{}{}{}{}{}'.format( *row )
+    print( s, r * 8 + 7 )
+
