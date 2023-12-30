@@ -1,13 +1,15 @@
 #!/bin/python3
 
+from itertools import cycle
+from math import lcm
+
 src = 'd2'
 src = 'dat'
 
 nodes = {}
 lnodes = []
 with open( src ) as f:
-  steps = f.readline().strip()
-  print( 'steps', steps )
+  steps = cycle( f.readline().strip() )
   f.readline()
 
   it = iter( f )
@@ -22,52 +24,27 @@ with open( src ) as f:
     lnodes.append(( n, nl, nr ))
     #print( '{} = ({}, {})'.format( n, nl, n ))
 
-if False:
-    cur = 'AAA'
-    si = 0
-    ct = 0
-    while cur != 'ZZZ':
-      nl, nr = nodes[ cur ]
-      s = steps[ si ]
-      si += 1
-      if si == len( steps ): si = 0
-      cur = nl if s == 'L' else nr
+curs = [( n, n, 0, False ) for n, _, _ in lnodes if n.endswith( 'A' )]
+
+for s in steps:
+  _curs = []
+  todo = False
+  for n0, n, ct, done in curs:
+    if not done:
       ct += 1
-
-    print( 'part1', ct )
-
-curs = [ n for n, nl, nr in lnodes if n.endswith( 'A' )]
-
-print( 'curs', curs )
-
-si = 0
-ct = 0
-while True:
-  s = steps[ si ]
-  l = []
-  na, nz = 0, 0
-  for cur in curs:
-    nl, nr = nodes[ cur ]
-    c = nl if s == 'L' else nr
-    if c.endswith( 'Z' ): nz += 1
-    if c.endswith( 'A' ): na += 1
-    l.append( c )
-
-  si += 1
-  if si == len( steps ): si = 0
-  ct += 1
-  curs = l
-  if False and nz or na:
-    _l = []
-    for i in l:
-      if i.endswith( 'A' ) or i.endswith( 'Z'):
-        _l.append( i )
+      nl, nr = nodes[ n ]
+      n = nl if s == 'L' else nr
+      if n.endswith( 'Z' ):
+        done = True
       else:
-        _l.append( '   ' )
-    print( 'curs', _l )
-
-  if nz == len( curs ):
+        todo = True
+    _curs.append(( n0, n, ct, done ))
+  curs = _curs
+  if not todo:
     break
 
+for n0, n, ct, _ in curs:
+  if n0 == 'AAA': print( 'part1', ct )
 
-print( 'part1', ct )
+print( 'part2', lcm(*[ ct for _, _, ct, _ in curs ]))
+
