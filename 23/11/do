@@ -1,0 +1,58 @@
+#!/bin/python3
+
+import itertools
+
+src = 'd0'
+src = 'dat'
+
+# read the map
+with open( src ) as f:
+  m = [ l.strip() for l in f.readlines() ]
+m0 = m
+
+# add the extra rows between the galaxies
+_m = []
+for row in m:
+  _m.append( row )
+  if '#' not in row: _m.append( row )
+m= _m
+h = len( m )
+
+# add the extra columns
+mt = []
+for c in range( len( m[ 0 ])):
+  mt.append( ''.join( m[ r ][ c ] for r in range( h )))
+_mt = []
+for col in mt:
+  _mt.append( col )
+  if '#' not in col: _mt.append( col )
+mt = _mt
+w = len( mt )
+
+_m = []
+for r in range( h ):
+  _m.append( ''.join( mt[ c ][ r ] for c in range( w )))
+m = _m
+
+#for row in m:
+#  print( row )
+
+gs = []
+for r in range( h ):
+  for c in range( w ):
+    if m[ r ][ c ] == '#':
+      gs.append(( r, c ))
+
+#print( gs, len( gs ))
+
+t = 0
+for g0, g1 in itertools.combinations( gs, 2 ):
+  r0, c0 = g0
+  r1, c1 = g1
+  t += abs( r1 - r0 ) + abs( c1 - c0 )
+  #print( r0, c0, r1, c1, d )
+print( 'part1', t )
+ 
+
+for row in m0:
+  

@@ -1,30 +1,116 @@
 #!/bin/python3
 
-src = 'd0'
+#rc = 'd0'
+#rc = 'd1'
+#rc = 'd2'
+#rc = 'd3'
 src = 'dat'
 
 with open( src ) as f:
-  seqs = [ l.strip().split() for l in f.readlines() ]
-  seqs = [[ int( s ) for s in seq ] for seq in seqs ]
+  map = [ l.strip() for l in f.readlines() ]
+w, h = len( map[ 0 ]), len( map )
+for r, l in enumerate( map ):
+  c = l.find( 'S' )
+  if c >= 0:
+    sr, sc = r, c
+    break
+print( 'sm', sr, 'sc', sc )
 
-t1, t2 = 0, 0
-for seq in seqs:
-  l = [ x for x in seq ]
-  ls = [ l ]
-  while any( x for x in l ):
-    l = [ l[ i + 1 ] - l[ i ] for i in range( len( l ) - 1 )]
-    ls.append( l )
-  #rint( 'ls', ls )
-  
-  l0 = ls[ -1 ]
-  x1 = 0
-  x2 = 0
-  for l in reversed( ls ):
-    x1 = l[ -1 ] + x1
-    x2 = l[ 0 ] - x2
-  t1 += x1
-  t2 += x2
 
-print( 'part1', t1 )
-print( 'part2', t2 )
- 
+def nbrs( r, c ):
+  tn = None if r == 0     else map[ r - 1 ][ c ]
+  ts = None if r == h - 1 else map[ r + 1 ][ c ]
+  te = None if c == w - 1 else map[ r ][ c + 1 ]
+  tw = None if c == 0     else map[ r ][ c - 1 ]
+  return tn, ts, te, tw
+
+r, c, r0, c0 = sr, sc, sr, sc
+tn, ts, te, tw = nbrs( sr, sc )
+print( tn, ts, te, tw )
+if   tn and tn in '7F|': r -= 1
+elif ts and ts in 'LJ|': r += 1
+elif te and te in '-7J': c += 1
+elif tw and tw in 'FL-': c -= 1
+else                   : x=1/0
+r1, c1 = r, c # 1st step
+rcs = [( sr, sc ), ( r, c )]
+while True:
+  t = map[ r ][ c ]
+  r1, c1 = r, c
+  if t == 'S':
+    break
+  elif t == '|':
+    r = r + 1 if r > r0 else r - 1
+  elif t == '-':
+    c = c + 1 if c > c0 else c - 1
+  elif t == 'L':
+    if r > r0:
+      c += 1
+    else:
+      r -= 1
+  elif t == 'J':
+    if r > r0:
+      c -= 1
+    else:
+      r -= 1
+  elif t == '7':
+    if c > c0:
+      r += 1
+    else:
+      c -= 1
+  elif t == 'F':
+    if r < r0:
+      c += 1
+    else:
+      r += 1
+  else:
+    x=1/0
+  rcs.append(( r, c ))
+  r0, c0 = r1, c1
+  #print( 'rcs', rcs )
+  #input()
+
+print( 'part1', len( rcs ) // 2 )
+
+# part 2:
+
+# replace the 'S' with the correct pipe
+tn, ts, te, tw = nbrs( sr, sc )
+if   tn and tn in 'F|7':
+  if   tw and tw in 'L-S': t = 'J'
+  elif te and te in '7-J': t = 'L'
+  else                   : t = '|'
+elif ts and ts in 'L|J':
+  if   tw and tw in 'L-S': t = '7'
+  elif te and te in '7-J': t = 'S'
+  else                   : t = '-'
+print( 't', t )
+map[ r ] = map[ r ].replace( 'S', t )
+
+ct = 0
+for r in range( h ):
+  ison = False
+  t0 = None
+  inloop = False
+  for c in range( w ):
+    t = map[ r ][ c ]
+    ison = ( r, c ) in rcs
+
+    if ison:
+      if t == '|':
+        inloop = not inloop
+      elif t0 is None:
+        t0 = t
+      else:
+        if t0 == 'F' and t == 'J' or t0 == 'L' and t == '7':
+          inloop = not inloop
+        if t in 'J7':
+          t0 = None
+
+    if not ison and inloop:
+      ct += 1
+      #print( '*' )
+    #rint( map[ r ][ c ] if ison else 'I' if inloop else 'O', end = '' )
+
+print( 'part2', ct )
+
