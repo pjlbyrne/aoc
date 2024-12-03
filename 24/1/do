@@ -1,0 +1,29 @@
+#!/bin/python
+
+src = 'd0'
+src = 'dat'
+
+l0, l1 = [], []
+with open( src ) as f:
+  for l in f:
+    x, y = l.split()
+    l0.append( int( x ))
+    l1.append( int( y ))
+
+t1 = 0
+for x, y in zip( sorted( l0 ), sorted( l1 )):
+  t1 = t1 + abs( x - y )
+print( 'part1', t1 )
+
+t2 = 0
+d = {}
+for x in l0:
+  if x not in d:
+    t = 0
+    for y in l1:
+      if x == y: t = t + 1
+    d[ x ] = t
+  else:
+    t = d[ x ]
+  t2 += x * t
+print( 'part2', t2 )

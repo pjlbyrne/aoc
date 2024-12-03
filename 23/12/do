@@ -1,0 +1,39 @@
+#!/bin/python3
+
+import itertools
+
+src = 'd0'
+#rc = 'dat'
+
+# read the map
+map = []
+with open( src ) as f:
+  for l in f:
+    l = l.strip().split()
+    s = l[ 0 ]
+    l = l[ 1 ].split( ',' )
+    print( s, l )
+    map.append( s, l )
+
+def match_iter( s0, s1, l, li ):
+
+  t = 0
+
+  if li == len( l ): return
+  if len( s1 ) == len( s0 ): return
+
+  si = len( s1 )
+  c = s0[ i ]
+
+  if c == '.':
+    s1.append( c )
+    t += match_iter( s0, s1, l, li )
+
+  elif c == '#':
+    
+
+t1 = 0
+for s, l in map:
+
+  t1 += match_iter( s, [],  l, 0 )
+

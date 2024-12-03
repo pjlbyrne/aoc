@@ -1,0 +1,47 @@
+#!/bin/python
+
+src = 'd0'
+src = 'dat'
+
+sgn = lambda x: -1 if x < 0 else ( 1 if x > 0 else 0 )
+
+def check( l ):
+  x0, s0, ok = None, None, True
+  for x1 in l:  
+    if x0 is not None:
+      if s0 is None:
+        s0 = sgn( x1 - x0 )
+      else:
+        if sgn( x1 - x0 ) != s0:
+          ok = False
+      d = abs( x1 - x0 )
+      if d < 1 or d > 3:
+        ok = False
+    x0 = x1
+  return ok
+
+t1 = 0
+with open( src ) as f:
+  for l in f:
+    l = [ int( x ) for x in l.split() ]
+    if check( l ): t1 += 1
+print( 'part1', t1 )
+
+t2 = 0
+with open( src ) as f:
+  for l in f:
+    l = [ int( x ) for x in l.split() ]
+    ok = False
+    if check( l ):
+      ok = True
+    else:
+      for i in range( len( l )):
+        _l = []
+        for j, x in enumerate( l ):
+          if j != i: _l.append( x )
+        if check( _l ):
+          ok = True
+          break
+    if ok:
+      t2 += 1
+print( 'part2', t2 )

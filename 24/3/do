@@ -1,0 +1,88 @@
+#!/bin/python
+
+src = 'd0'
+src = 'd1'
+src = 'dat'
+
+t1, s, l0, l1 = 0, 0, [], []
+with open( src ) as f:
+  while True:
+    c = f.read( 1 )
+    if not c: break
+    if s == 0:
+      if c == 'm': s = 1
+    elif s == 1:
+      s = 2 if c == 'u' else 0
+    elif s == 2:
+      s = 3 if c == 'l' else 0
+    elif s == 3:
+      s = 4 if c == '(' else 0
+    elif s == 4:
+      if   c in '0123456789': l0.append( c )
+      elif c == ',': s = 5
+      else:
+        l0 = []
+    elif s == 5:
+      if   c in '0123456789': l1.append( c )
+      else:
+        if c == ')':
+          s = 0
+          m = int( ''.join( l0 ))
+          n = int( ''.join( l1 ))
+          t1 += m * n
+        s, l0, l1 = 0, [], []
+print( 'part1', t1 )
+
+t2, domul, s, t = 0, True, 0, 0
+with open( src ) as f:
+  while True:
+    c = f.read( 1 )
+    if not c: break
+   #print( c, s, t )
+    if s == 0:
+      if c == 'm': s = 1
+    elif s == 1:
+      s = 2 if c == 'u' else 0
+    elif s == 2:
+      s = 3 if c == 'l' else 0
+    elif s == 3:
+      s = 4 if c == '(' else 0
+    elif s == 4:
+      if   c in '0123456789': l0.append( c )
+      elif c == ',': s = 5
+      else:
+        l0 = []
+    elif s == 5:
+      if   c in '0123456789': l1.append( c )
+      else:
+        if c == ')':
+          m = int( ''.join( l0 ))
+          n = int( ''.join( l1 ))
+         #print( 'mul({},{})'.format( m, n ))
+          if domul:
+            t2 += m * n
+        s, l0, l1 = 0, [], []
+    
+    if t == 0:
+      if c == 'd': t = 1
+    elif t == 1:
+      t = 2 if c == 'o' else 0
+    elif t == 2:
+      t = 3 if c =='(' else 4 if c == 'n' else 0
+    elif t == 3:
+      if c == ')':
+        domul = True
+       #print( 'do()' )
+      t = 0
+    elif t == 4:
+      t = 5 if c == '\'' else 0
+    elif t == 5:
+      t = 6 if c == 't' else 0
+    elif t == 6:
+      t = 7 if c == '(' else 0
+    elif t == 7:
+      if c == ')':
+       #print( 'don\'t()' )
+        domul, t = False, 0
+print( 'part2', t2 )
+

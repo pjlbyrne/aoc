@@ -10,49 +10,58 @@ with open( src ) as f:
   m = [ l.strip() for l in f.readlines() ]
 m0 = m
 
-# add the extra rows between the galaxies
-_m = []
+# count distances over the rows
+dr1, dr2 = [], [] # blank row is 2 / 1000000
 for row in m:
-  _m.append( row )
-  if '#' not in row: _m.append( row )
-m= _m
+  if '#' not in row:
+    d1, d2 = 2, 1000000
+  else:
+    d1, d2 = 1, 1
+  dr1.append( d1 )
+  dr2.append( d2 )
 h = len( m )
 
-# add the extra columns
+# transpose the map
 mt = []
 for c in range( len( m[ 0 ])):
   mt.append( ''.join( m[ r ][ c ] for r in range( h )))
-_mt = []
+
+# count distances over the columns
+dc1, dc2 = [], [] # blank col is 2 / 1000000
 for col in mt:
-  _mt.append( col )
-  if '#' not in col: _mt.append( col )
-mt = _mt
+  if '#' not in col:
+    d1, d2 = 2, 1000000
+  else:
+    d1, d2 = 1, 1
+  dc1.append( d1 )
+  dc2.append( d2 )
 w = len( mt )
 
-_m = []
-for r in range( h ):
-  _m.append( ''.join( mt[ c ][ r ] for c in range( w )))
-m = _m
-
-#for row in m:
-#  print( row )
-
+# find all galaxies
 gs = []
 for r in range( h ):
   for c in range( w ):
     if m[ r ][ c ] == '#':
       gs.append(( r, c ))
 
-#print( gs, len( gs ))
-
-t = 0
+# measure all distances
+t1, t2 = 0, 0
 for g0, g1 in itertools.combinations( gs, 2 ):
   r0, c0 = g0
   r1, c1 = g1
-  t += abs( r1 - r0 ) + abs( c1 - c0 )
-  #print( r0, c0, r1, c1, d )
-print( 'part1', t )
- 
+  probe = False #r0 == 5 and c0 == 1 and r1 == 0 and c1 == 4
+  _t1 = t1
+  if r1 != r0:
+    for r in range( r0, r1, ( r1 - r0 ) // abs( r1 - r0 )):
+      t1 += dr1[ r ]
+      t2 += dr2[ r ]
+      if probe: print( 'r', dr1[ r ])
+  if c1 != c0:
+    for c in range( c0, c1, ( c1 - c0 ) // abs( c1 - c0 )):
+      t1 += dc1[ c ]
+      t2 += dc2[ c ]
+      if probe: print( 'c', dc1[ c ])
+  if probe: print( r0, c0, r1, c1, t1 - _t1 )
+print( 'part1', t1 )
+print( 'part2', t2 )
 
-for row in m0:
-  
