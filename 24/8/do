@@ -1,0 +1,66 @@
+#!/bin/python
+
+from itertools import permutations
+
+src = 'd0'
+src = 'dat'
+
+d = {}
+m, n, o = [], [], []
+with open( src ) as f:
+  for r, l in enumerate( f ):
+    l = l.strip()
+    m.append([ x for x in l ])
+    n.append([ x for x in l ])
+    o.append([ x for x in l ])
+    for c, x in enumerate( l ):
+      if x != '.':
+        d.setdefault( x, [] ).append(( r, c ))
+w, h = len( m[ 0 ]), len( m )
+
+for lr in m:
+  print( ''.join( lr ))
+
+t1, t2 = 0, 0
+for x in d:
+  l = d[ x ]
+  for p0, p1 in permutations( l, 2 ):
+    r0, c0 = p0
+    r1, c1 = p1
+    dr = r0 - r1
+    dc = c0 - c1
+
+    r3, c3 = r0 + dr, c0 + dc
+    r4, c4 = r1 - dr, c1 - dc
+    if r3 >= 0 and r3 < h and c3 >= 0 and c3 < w:
+     #print( x, r3, c3 )
+      if n[ r3 ][ c3 ] != '#':
+        t1 += 1
+        n[ r3 ][ c3 ] = '#'
+    if r4 >= 0 and r4 < h and c4 >= 0 and c4 < w:
+     #print( x, r4, c4 )
+      if n[ r4 ][ c4 ] != '#':
+        t1 += 1
+        n[ r4 ][ c4 ] = '#'
+
+    r, c = r1, c1
+    while r >= 0 and r < h and c >= 0 and c < w:
+      if o[ r ][ c ] != '#':
+        t2 += 1
+        o[ r ][ c ] = '#'
+      r -= dr
+      c -= dc
+
+    r, c = r0, c0
+    while r >= 0 and r < h and c >= 0 and c < w:
+      if o[ r ][ c ] != '#':
+        t2 += 1
+        o[ r ][ c ] = '#'
+      r += dr
+      c += dc
+
+
+#for l in n:
+#  print( ''.join( l ))
+print( 'part1', t1 )
+print( 'part2', t2 )
