@@ -1,0 +1,56 @@
+#!/bin/python
+
+src = 'd0'
+src = 'dat'
+
+with open( src ) as f:
+  for r, s in enumerate( f ):
+    s = s.strip()
+
+sz = sum([ int( c ) for c in s ])
+sl, sh = 0, len( s ) - 1
+
+bl = bl0 = int( s[ sl ])
+bh = bh0 = int( s[ sh ])
+
+j = 0
+t1 = 0
+while sl <= sh:
+
+  # Last block: only do what hasn't been gap-filled.
+  if sl == sh:
+    bl -= ( bh0 - bh )
+
+  # Do all of a low block.
+  while bl > 0:
+    #rint( 'lo {} * {}'.format( j, sl // 2 ))
+    t1 += j * ( sl // 2 )
+    j += 1
+    bl -= 1
+
+  # Last block we are done.
+  if sl == sh:
+    sl += 1
+    continue
+
+  # Get the gap.
+  sl += 1
+  bl = int( s[ sl ])
+
+  # Do as many high blocks as will fit into the next gap.
+  while bl > 0:
+    #rint( 'hi {} * {}'.format( j, sh // 2 ), bh )
+    t1 += j * ( sh // 2 )
+    j += 1
+    bl -= 1
+    bh -= 1
+    if bh == 0:
+      sh -= 2
+      bh = bh0 = int( s[ sh ])
+    
+  # Get the next block.
+  sl += 1
+  bl = bl0 = int( s[ sl ])
+
+  #rint( sl, sh )
+print( 'part', t1 )
