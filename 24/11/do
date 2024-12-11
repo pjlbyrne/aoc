@@ -1,0 +1,40 @@
+#!/bin/python
+
+import sys
+src = sys.argv[ 1 ]
+with open( src ) as f:
+  l = f.read()
+  l = [ int( s ) for s in l.split() ]
+  d = {}
+  for x in l:
+    if x not in d:
+      d[ x ] = d.get( x, 0 ) + 1
+
+#for x, n in d.items(): print( x, n )
+
+for i in range( 75 ):
+  _d = d
+  d = {}
+  for x, n in _d.items():
+    s = str( x )
+    if x == 0:
+      d[ 1 ] = d.get( 1, 0 ) +  n
+    else:
+      s = str( x )
+      m = len( s )
+      m2 = m // 2
+      if m2 * 2 == m:
+        x = int( s[ :m2 ])
+        d[ x ] = d.get( x, 0 ) + n
+        x = int( s[ m2: ])
+        d[ x ] = d.get( x, 0 ) + n
+      else:
+        x = x * 2024
+        d[ x ] = d.get( x, 0 ) + n
+ #print( d )
+
+# 148927 correct
+#rint( 'part1', sum( n for n in d.values() ))
+
+# 220357186726677 correct
+print( 'part2', sum( n for n in d.values() ))
