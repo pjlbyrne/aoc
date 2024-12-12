@@ -1,0 +1,71 @@
+#!/bin/python
+
+import sys
+src = sys.argv[ 1 ]
+m = []
+with open( src ) as f:
+  for l in f:
+    l = l.strip()
+    m.append([ p for p in l ])
+H, W = len( m ), len( m[ 0 ])
+h, w = H-1, W-1
+n = [[ '.' for _ in range( W )] for _ in range( H )]
+
+# Return true if out of bounds.
+def off_map( r, c ):
+  return r < 0 or r > h or c < 0 or c > w
+
+# Flood-fill from a point.
+def flood( r, c ):
+  f = m[r][c]
+  if n[r][c] == '#': return 0, 0
+  n[r][c] = '#'
+  a, p = 1, 0
+
+  for _r, _c in [( r-1, c ), ( r+1, c ), ( r, c-1 ), ( r, c+1 )]:
+    if off_map( _r, _c ):
+      p += 1 # fence on edge of map
+    else:
+      _f = m[ _r ][ _c ]          # what is at new pos
+      if _f == f:                 # same as here:
+        da, dp = flood( _r, _c )  #   fill in new pos
+        a, p = a + da, p + dp     #   add on totals from new pos
+      else:                       # different:
+        p += 1                    # perim fence
+  return a, p
+
+# Flood-fill from all points.
+regions = []
+for r in range( H ):
+  for c in range( W ):
+    if n[r][c] == '#': continue
+    a, p = flood( r, c )
+    regions.append(( r, c, a, p ))
+   #print( m[r][c], r, c, a, p )
+
+#for l in m: print( ''.join( f for f in l ))
+
+# Part 1 is area * perimeter for all regions.
+print( 'part1', sum( a * p for r, c, a, p in regions ))
+
+
+# Flood-fill from a point, pass in parent point.
+def flood( r, c, r0, c0 ):
+  f = m[r][c]
+  if n[r][c] == '#': return 0, 0
+  n[r][c] = '#'
+  a, p = 1, 0
+
+  for dr, dc in [( -1, 0 ), ( 1, 0 ), ( 0, -1 ), ( 0, 1 )]:
+    if off_map( r+dr, dc )
+      if not off_map( r0+dr, c0+dc ):
+        p += 1
+    else:
+      _f = m[ r+dr ][ c+dc ]
+      if _f == f:
+        da, dp = flood( r+dr, c+dc )
+        a, p = a + da, p + dp
+      else:
+        p += 1
+  return a, p
+
