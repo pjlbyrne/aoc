@@ -1,165 +1,92 @@
 #!/bin/python
 
-src = 'd0'
-src = 'dat'
+# Input map from command.
+import sys
+src = sys.argv[ 1 ]
 
+# Read the map.
 m = []
 with open( src ) as f:
   for r, s in enumerate( f ):
     s = s.strip()
     if '^' in s:
-      r0, c0 = r, s.find( '^' )
+      s0, r0, c0 = '^', r, s.find( '^' )
     l = [ x for x in s ]
     m.append( l )
 
-#rint( r0, c0, m[ r0 ][ c0 ])
-
-h, w = len( m ), len( m[ 0 ])
-t1, t2 = 0, 0
-on_map = True
-
-# This will record visited positions for part 1.
-n = [ [ '.' for c in range( w ) ] for r in range( h )]
-
-# This will record obsctacle positions.
-o = [ [ '.' for c in range( w ) ] for r in range( h )]
-
-# Sentry orientation.
-s = m[ r0 ][ c0 ]
-
-# Move the sentry until she strays off the map.
-r, c = r0, c0
-while on_map:
-  fwd = False
-  _r, _c = r, c
-  s0 = s
-
-  # Check for off-map, and turn if obstacle ahead.
-  while on_map and not fwd:
+# Map bounds.
+H, W = len( m ), len( m[ 0 ])
+h, w = H-1, W-1
+ 
+# Turn until we can move forward.
+def move( step ):
+  s, r, c = step
+  while True:
     if s == '^':
-      if r == 0               : on_map = False; continue
-      if m[ r-1 ][ c ] == '#' : s = '>'       ; continue
-      _r, fwd = r-1, True
+      if r == 0 or m[r-1][c] != '#': return ( s, r-1, c )
+      s = '>'
     elif s == '>':
-      if c == w - 1           : on_map = False; continue
-      if m[ r ][ c+1 ] == '#' : s = 'v'       ; continue
-      _c, fwd = c+1, True
+      if c == w or m[r][c+1] != '#': return ( s, r, c+1 )
+      s = 'v'
     elif s == 'v':
-      if r == h - 1           : on_map = False; continue
-      if m[ r+1 ][ c ] == '#' : s = '<'       ; continue
-      _r, fwd = r+1, True
+      if r == h or m[r+1][c] != '#': return ( s, r+1, c )
+      s = '<'
     else: # s == '<':
-      if c == 0               : on_map = False; continue
-      if m[ r ][ c-1 ] == '#' : s = '^'       ; continue
-      _c, fwd = c-1, True
+      if c == 0 or m[r][c-1] != '#': return ( s, r, c-1 )
+      s = '^'
+ 
+# Return true if out of bounds.
+def off_map( st ):
+  _, r, c = st
+  return r < 0 or r > h or c < 0 or c > w
+ 
+# Patrol until off-map or looping.
+def patrol( st ):
+  sts = set()
+  while True:
+    _st = move( st )                # work out next location
+    if off_map( _st ): return True  # off-map: done
+    if _st in sts: return False     # looping: done
+    sts.add( _st )                  # record step
+    st = _st                        # next step
+ 
+# Visited positions for part 1.
+n = [[ '.' for c in range( W ) ] for r in range( H )]
 
-  # Count unvisited positions for part 1.
-  if n[ r ][ c ] == '.':
-    t1 += 1
-    n[ r ][ c ] = '#'
+# Obstacles that cause loops for part 2.
+o = [[ '.' for c in range( W ) ] for r in range( H )]
 
-  # We are done.
-  if not on_map: break
-
-  # Record the trail.
-  f = m[ r ][ c ]
-
-  # Going left/right now.
-  if s == '<' or s == '>':
-
-    # We were going up/down so we turned.
-    if s0 != '<' and s0 != '>':
-      f = '+'
-
-    # Crossing old trail.
-    elif f == '|':
-      f = '+'
-
-    # New trail.
-    else:
-      f = '-'
-
-    # Going left can we place obstacle?
-    if s == '<':
-      if _c >= 0 and m[ r ][ _c ] != '#':
-
-        # We can place an obstacle on the left so sentry will turn right but will she loop?
-        __r = r
-        while __r >= 0:
-          if m[ __r ][ c ] == '#' and m[ __r+1 ][ c ] == '+':
-            o[ r ][ c-1 ] = 'O'
-            t2 += 1
-            break
-          __r -= 1
-
-    # Going right can we place obstacle?
-    else:
-      if _c < w and m[ r ][ _c ] != '#':
-
-        # We can place an obstacle on the right so sentry will turn right but will she loop?
-        __r = r
-        while __r < h:
-          if m[ __r ][ c ] == '#' and m[ __r-1 ][ c ] == '+':
-            o[ r ][ c+1 ] = 'O'
-            t2 += 1
-            break
-          __r += 1
-
-  # Going up/down now.
-  else: # s == '^' or s == 'v':
-
-    # Were going left/right so we turned.
-    if s0 != '^' and s0 != 'v':
-      f = '+'
-
-    # Crossing old trail.
-    elif f == '-':
-      f = '+'
-
-    # New trail.
-    else:
-      f = '|'
-
-    # Going up can we place obstacle?
-    if s == '^':
-      if _r >= 0 and m[ _r ][ c ] != '#':
-
-        # We can place an obstacle above so sentry will turn right but will she loop?
-        __c = c
-        while __c < w:
-          if m[ r ][ __c ] == '#' and m[ r ][ __c-1 ] == '+':
-            o[ r-1 ][ c ] = 'O'
-            t2 += 1
-            break
-          __c += 1
-
-    # Going down can we place obstacle?
-    else:
-      if _r < h and m[ _r ][ c ] != '#':
-
-        # We can place an obstacle below so sentry will turn right but will she loop?
-        __c = c
-        while __c >= 0:
-          if m[ r ][ __c ] == '#' and m[ r ][ __c+1 ] == '+':
-            o[ r+1 ][ c ] = 'O'
-            t2 += 1
-          __c -= 1
-
-  # Put the trail on the map.
-  m[ r ][ c ] = f
-
-  # Move the sentry.
-  r, c = _r, _c
-
-for l1, l2 in zip( m, o ):
-  for c1, c2 in zip( l1, l2 ):
-    if c2 == 'O':
-      print( c2, end = '' )
-    else:
-      print( c1, end = '' )
-  print()
-
-#for l in n:
-#  print( ''.join( l ))
-print( 'part1', t1 )
-print( 'part2', t2 ) # 696 too low
+# Run until off-map.
+st0 = ( s0, r0, c0 )
+_st = st0
+while True:
+  st = move( _st )                  # next step
+  if off_map( st ): break           # off map: done
+  s, r, c = st                      # next orientaion & position
+  f = m[r][c]                       # whats there
+  if f != '#' and (r,c) != (r0,c0): # no obstacle ahead and not start pos
+      m[r][c] = '#'                 #   place obstacle
+      if not patrol( st0 ):         #   does it cause a loop?
+        o[r][c] = 'O'               #     record the obstacle
+      m[r][c] = f                   #   remove obstacle
+  _st = st                          # take step
+  n[r][c] = '#'                     # record visited location for part 1
+ 
+  # Put trail on map.
+#m[r][c] = '+'   if s in [ '<', '>' ] and f == '|' \
+#     else '+'   if s in [ '^', 'v' ] and f == '-' \
+#     else '-'   if s in [ '<', '>' ] \
+#     else '|' # if s in [ '^', 'v' ]
+ 
+if False:
+  for l1, l2 in zip( m, o ):
+    for c1, c2 in zip( l1, l2 ): print( c2 if c2 == 'O' else c1, end = '' )
+    print()
+ 
+# 4903 correct
+print( 'part1', sum( sum( 1 for f in l if f == '#' ) for l in n ))
+ 
+# 696 too low
+# 2140 not right
+# 1997 not right
+print( 'part2', sum( sum( 1 for f in l if f == 'O' ) for l in o ))
