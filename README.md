@@ -1,3 +1,2 @@
-# aoc
-# (c) Patrick Byrne 2023
+# (c) Patrick Byrne 2024
 # Advent of Code workings
