@@ -9,7 +9,6 @@ with open( src ) as f:
     m.append([ p for p in l ])
 H, W = len( m ), len( m[ 0 ])
 h, w = H-1, W-1
-n = [[ '.' for _ in range( W )] for _ in range( H )]
 
 # Return true if out of bounds.
 def off_map( r, c ):
@@ -35,6 +34,7 @@ def flood( r, c ):
   return a, p
 
 # Flood-fill from all points.
+n = [[ '.' for _ in range( W )] for _ in range( H )]
 regions = []
 for r in range( H ):
   for c in range( W ):
@@ -50,22 +50,43 @@ print( 'part1', sum( a * p for r, c, a, p in regions ))
 
 
 # Flood-fill from a point, pass in parent point.
-def flood( r, c, r0, c0 ):
+def flood2( r, c, r0 = None, c0 = None ):
   f = m[r][c]
+  probe = f == 'A'
   if n[r][c] == '#': return 0, 0
   n[r][c] = '#'
   a, p = 1, 0
 
   for dr, dc in [( -1, 0 ), ( 1, 0 ), ( 0, -1 ), ( 0, 1 )]:
-    if off_map( r+dr, dc )
-      if not off_map( r0+dr, c0+dc ):
+    if off_map( r+dr, c+dc ):
+      if r0 is None or not off_map( r0+dr, c0+dc ):
         p += 1
+        print( '101 [{}] ({:2},{:2} ) + ({:2},{:2} ) out'.format( f , r, c, dr, dc ))
     else:
       _f = m[ r+dr ][ c+dc ]
       if _f == f:
-        da, dp = flood( r+dr, c+dc )
+        da, dp = flood2( r+dr, c+dc, r, c )
         a, p = a + da, p + dp
       else:
-        p += 1
+        if r0 is not None:
+          _f0 = m[ r0+dr ][ c0+dc ]
+          if _f0 == f:
+            p += 1
+            print( '102 [{}] ({:2},{:2} ) + ({:2},{:2} ), _f={}, r0=({:2},{:2} ), _f0={}'.format( f, r, c, dr, dc, _f, r0, c0, _f0 ))
+        else:
+          p += 1
+          print( '103 [{}] ({:2},{:2} ) + ({:2},{:2} ), root'.format( f, r, c, dr, dc ))
   return a, p
 
+# Flood-fill from all points.
+n = [[ '.' for _ in range( W )] for _ in range( H )]
+regions = []
+for r in range( H ):
+  for c in range( W ):
+    if n[r][c] == '#': continue
+    a, p = flood2( r, c )
+    regions.append(( r, c, a, p ))
+    print( m[r][c], r, c, a, p )
+
+# Part 2 is area * sides for all regions.
+print( 'part2', sum( a * p for _, _, a, p in regions ))

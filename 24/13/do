@@ -1,0 +1,75 @@
+#!/bin/python
+
+import sys
+src = sys.argv[ 1 ]
+machines, machines2 = [], []
+with open( src ) as f:
+  for l in f:
+    l = l.strip().split()
+    if not l: continue
+    if l[ 0 ] == 'Button':
+      if l[ 1 ] == 'A:':
+        ax, ay = int( l[2][2:-1]), int( l[3][2:])
+      else:
+        bx, by = int( l[2][2:-1]), int( l[3][2:])
+    if l[ 0 ] == 'Prize:':
+      px, py = int( l[1][2:-1]), int( l[2][2:])
+      machines.append(( ax, ay, bx, by, px, py ))
+      machines2.append(( ax, ay, bx, by, px + 10000000000000, py + 10000000000000 ))
+
+def check( m ):
+  ax, ay, bx, by, px, py = m
+
+  # It would be cheapest to reach the prize with only pushes of button B,
+  # so start with the closest number of B steps, and decrease B steps while
+  # increasing A until we get a match in both X and Y.
+  na, nb = 0, px // bx
+
+  while nb > 0:
+
+    x = na * ax + nb * bx
+    y = na * ay + nb * by
+    if abs( x - px ) == 0 and abs( y - py ) == 0:
+      return na, nb
+
+    # Try increasing na at current nb to get a match.
+    if x < px:
+      _na = na + 1
+      while x < px:
+        x, y = _na * ax + nb * bx, _na * ay + nb * by
+        if abs( x - px ) == 0 and abs( y - py ) == 0:
+          return _na, nb
+        _na = _na + 1
+
+    # Try decreasing na at current nb to get a match.
+    else:
+      _na = na + 1
+      while x < px:
+        x, y = _na * ax + nb * bx, _na * ay + nb * by
+        if abs( x - px ) == 0 and abs( y - py ) == 0:
+          return _na, nb
+        _na = _na - 1
+
+    # No values of na with current nb match.
+    nb -= 1
+ 
+  # oops no solution
+  return None, None
+
+t1 = 0
+for m in machines:
+  na, nb = check( m )
+  if na is None:
+    continue
+  t1 = t1 + 3 * na + nb
+
+print( 'part1', t1 )
+
+t2 = 0
+for m in machines2:
+  print( m )
+  na, nb = check( m )
+  if na is None:
+    continue
+  t2 = t2 + 3 * na + nb
+print( 'part2', t2 )
