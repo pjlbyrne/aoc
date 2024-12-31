@@ -2,7 +2,7 @@
 
 import sys
 src = sys.argv[ 1 ]
-machines, machines2 = [], []
+machines = []
 with open( src ) as f:
   for l in f:
     l = l.strip().split()
@@ -15,7 +15,6 @@ with open( src ) as f:
     if l[ 0 ] == 'Prize:':
       px, py = int( l[1][2:-1]), int( l[2][2:])
       machines.append(( ax, ay, bx, by, px, py ))
-      machines2.append(( ax, ay, bx, by, px + 10000000000000, py + 10000000000000 ))
 
 def check( m ):
   ax, ay, bx, by, px, py = m
@@ -65,11 +64,46 @@ for m in machines:
 
 print( 'part1', t1 )
 
+# For part 2 the simple search is too slow. We need Cramer's rule.
+#
+# a1 * x + b1 * y = c1
+# a2 * x + b2 * y = c2
+#
+#     |c1 b1|
+#     !c2 b2|   c1 * b2 - b1 * c2
+# x = ------- = -----------------
+#     |a1 b1|   a1 * b2 - b1 * a2
+#     |a2 b2|
+#
+#     |a1 c1|
+#     !a2 c2|   a1 * c2 - c1 * a2
+# y = ------- = -----------------
+#     |a1 b1|   a1 * b2 - b1 * a2
+#     |a2 b2|
+#
 t2 = 0
-for m in machines2:
-  print( m )
-  na, nb = check( m )
-  if na is None:
-    continue
+N = 10000000000000
+for ax, ay, bx, by, px, py in machines:
+  px, py = N + px, N + py
+ 
+  # Here the two linear equations are:
+  #
+  #   ax * na + bx * nb = px
+  #   ay * na + by * nb = py
+  #
+  # Substituting in Cramer's rule:
+  #
+  #   na = ( px * by - bx * py ) // ( ax * by - bx * ay )
+  #   nb = ( px * by - bx * py ) // ( ax * by - bx * ay )
+
+  d = ( ax * by - bx * ay )
+  if d == 0: continue # no solution
+  na = ( px * by - bx * py ) // d
+  nb = ( ax * py - px * ay ) // d
+  _px = ax * na + bx * nb
+  _py = ay * na + by * nb
+  if _px != px or _py != py: continue
   t2 = t2 + 3 * na + nb
+
+
 print( 'part2', t2 )
