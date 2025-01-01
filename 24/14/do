@@ -1,0 +1,106 @@
+#!/bin/python
+
+import sys
+src = sys.argv[ 1 ]
+if src == 'd0':
+  w, h = 11, 7
+elif src == 'dat':
+  w, h = 101, 103
+else:
+  sys.exit( 1 )
+robots = []
+with open( src ) as f:
+  for l in f:
+    l = l.strip().split()
+    p, v = l
+    _, p = p.split( '=' )
+    _, v = v.split( '=' )
+    px, py = p.split( ',' )
+    vx, vy = v.split( ',' )
+    robots.append(( int( px ), int( py ), int( vx ), int( vy )))
+
+def draw_map( l ):
+  m = [ [ '.' for c in range( w ) ] for r in range( h ) ]
+  for px, py, vx, vy in l:
+    c = m[ py ][ px ]
+    c = 'M' if c == 'M' else 'M' if c == '3' else '3' if c == '2' else '2' if c == '1' else '1' if c == '.' else c
+    m[ py ][ px ] = c
+  for l in m:
+    print( ''.join( l ))
+
+# Advance the robots for 100 seconds.
+l = [ r for r in robots ]
+for t in range( 100 ):
+  _l = []
+  for px, py, vx, vy in l:
+    px = ( px + vx ) % w
+    py = ( py + vy ) % h
+    _l.append(( px, py, vx, vy ))
+  l = _l
+ #draw_map( l )
+
+w2 = ( w - 1 ) // 2
+h2 = ( h - 1 ) // 2
+q1, q2, q3, q4 = 0, 0, 0, 0 # four quadrants nw,ne,sw,se
+for px, py, _, _ in l:
+  if px == w2 or py == h2: continue # exactly in middle
+  if px < w2:
+    if py < h2: q1 += 1 # nw
+    else      : q3 += 1 # sw
+  else:
+    if py < h2: q2 += 1 # ne
+    else      : q4 += 1 # se
+
+print( 'part1', q1 * q2 * q3 * q4 )
+
+def plot( l ):
+  m = [ [ '.' for c in range( w ) ] for r in range( h ) ]
+  for px, py, vx, vy in l:
+    c = m[ py ][ px ]
+    c = 'M' if c == 'M' else 'M' if c == '3' else '3' if c == '2' else '2' if c == '1' else '1' if c == '.' else c
+    m[ py ][ px ] = c
+  return m
+
+# Advance the robots until we get symmetry.
+l = [ r for r in robots ]
+t = 0
+_t = -1000
+ct_min = 999999
+while True:
+  _l = []
+  pts = set()
+  for px, py, vx, vy in l:
+    px = ( px + vx ) % w
+    py = ( py + vy ) % h
+    _l.append(( px, py, vx, vy ))
+    if px != w2 and py != h2:
+      if px < w2:
+        if py < h2: q1 += 1 # nw
+        else      : q3 += 1 # sw
+      else:
+        if py < h2: q2 += 1 # ne
+        else      : q4 += 1 # se
+    pts.add(( px, py ))
+  l = _l
+ #if q1 == q2 and q3 == q4:
+ #  draw_map( l )
+ #  print( 'part2', t )
+ # #input()
+ # #sys.exit()
+
+  # Count the robots with no robot to the right of it.
+  ct = 0
+  for px, py in pts:
+    px = ( px + 1 ) % w
+    if ( px, py ) not in pts:
+      ct += 1
+  if ct < ct_min:
+    ct_min = ct
+    draw_map( l )
+    print( 't', t, 'ct', ct ) # 6770 too low
+    input()
+
+  t += 1
+  if t - _t > 1000:
+    _t = t
+    print( 't', t )
